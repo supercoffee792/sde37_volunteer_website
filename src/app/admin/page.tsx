@@ -5,7 +5,7 @@ export default function Adminpage() {
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
             <Usernavbar/>
-            <p className="text-white">change 1</p>
+            <p className="text-white">change 2</p>
         </div>
     );
 }
