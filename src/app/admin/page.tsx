@@ -1,10 +1,11 @@
 import Link from "next/link";
-import Navbar from "../components/Navbar";
+import Usernavbar from "../components/Usernavbar";
 
 export default function Adminpage() {
     return (
-        <div>
-            <p>testing</p>
+        <div className="bg-slate-800 h-screen overflow-x-hidden">
+            <Usernavbar/>
+            <p className="text-white">change 1</p>
         </div>
     );
 }
