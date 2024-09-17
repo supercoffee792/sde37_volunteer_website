@@ -10,16 +10,16 @@ export default function Userprofile() {
                     <strong>Username</strong>
                 </div>
                 <div className="w-2/3 bg-slate-800 p-6">
-                        <h2 className="text-xl font-semibold">Personal Information</h2>
-                        <p className="mt-2"><strong>Email:</strong> user@example.com</p>
-                        <p><strong>Age:</strong> 30</p>
-                        <p><strong>Address:</strong> 30</p>
-                        <p><strong>City:</strong></p>
-                        <p><strong>State:</strong></p>
-                        <p><strong>Zip code:</strong></p>
-                        <p><strong>Skills:</strong></p>
-                        <p><strong>Availability:</strong></p>
-                        <p><strong>Preferences:</strong></p>
+                    <h2 className="text-xl font-semibold">Personal Information</h2>
+                    <p className="mt-2"><strong>Email:</strong> user@example.com</p>
+                    <p><strong>Age:</strong> 30</p>
+                    <p><strong>Address:</strong> 30</p>
+                    <p><strong>City:</strong></p>
+                    <p><strong>State:</strong></p>
+                    <p><strong>Zip code:</strong></p>
+                    <p><strong>Skills:</strong></p>
+                    <p><strong>Availability:</strong></p>
+                    <p><strong>Preferences:</strong></p>
                 </div>
             </div>
         </div>
