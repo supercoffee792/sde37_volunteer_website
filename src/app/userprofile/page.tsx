@@ -204,5 +204,6 @@ export default function Userprofile() {
                     </div>
             </div>
         </div>
+        </div>
     );
 }
