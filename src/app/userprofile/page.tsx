@@ -122,27 +122,29 @@ export default function Userprofile() {
                     <div className="flex-grow pt-2 pl-8 pr-8 pb-8">
                         {/* Skills*/}
                         <div className="mb-4 flex-col">
+                            {/* on= bg-slate-400 text-slate-800
+                            off= bg-slate-600 text-slate-700  */}
                             <h2 className="text-2xl text-white font-semibold mb-4">Skills</h2>
                             <div className="w-full bg-white p-6 rounded-lg shadow-md flex inline-flex flex-wrap gap-2">
-                            <button className="bg-green-200 text-green-800 py-2 px-4 rounded-full">Heavy lifting/Manual Labor</button>
-                                <button className="bg-blue-200 text-blue-800 py-2 px-4 rounded-full">Food Safety Certification</button>
-                                <button className="bg-yellow-200 text-yellow-800 py-2 px-4 rounded-full">Public Speaking</button>
-                                <button className="bg-green-200 text-green-800 py-2 px-4 rounded-full">First Aid/CPR Certified</button>
-                                <button className="bg-red-200 text-red-800 py-2 px-4 rounded-full">Good With Children</button>
-                                <button className="bg-blue-200 text-blue-800 py-2 px-4 rounded-full">Problem Solving</button>
-                                <button className="bg-orange-200 text-orange-800 py-2 px-4 rounded-full">Creative Arts</button>
-                                <button className="bg-yellow-200 text-yellow-800 py-2 px-4 rounded-full">Advanced Medical Training</button>
-                                <button className="bg-red-200 text-red-800 py-2 px-4 rounded-full">Typing</button>
-                                <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded-full">Good With Seniors</button>
-                                <button className="bg-orange-200 text-orange-800 py-2 px-4 rounded-full">Literacy</button>
-                                <button className="bg-blue-200 text-blue-800 py-2 px-4 rounded-full">Willing to Drive</button>
-                                <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded-full">Good with Technology</button>
-                                <button className="bg-yellow-200 text-yellow-800 py-2 px-4 rounded-full">Carpentry</button>  
-                                <button className="bg-blue-200 text-blue-800 py-2 px-4 rounded-full">Programming</button>
-                                <button className="bg-red-200 text-red-800 py-2 px-4 rounded-full">Cooking</button>
-                                <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded-full">Multilingual</button>
-                                <button className="bg-orange-200 text-orange-800 py-2 px-4 rounded-full">Good With Animals</button>
-                                <button className="bg-green-200 text-green-800 py-2 px-4 rounded-full">Leadership/Management</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Heavy lifting/Manual Labor</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Food Safety Certification</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Public Speaking</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">First Aid/CPR Certified</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Good With Children</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Problem Solving</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Creative Arts</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Advanced Medical Training</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Typing</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Good With Seniors</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Literacy</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Willing to Drive</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Good with Technology</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Carpentry</button>  
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Programming</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Cooking</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Multilingual</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Good With Animals</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Leadership/Management</button>
                             </div>
                         </div>
 
@@ -150,12 +152,12 @@ export default function Userprofile() {
                         <div className="mb-4 flex-col">
                             <h2 className="text-2xl text-white font-semibold mb-4">Preferences</h2>
                             <div className="w-full bg-white p-6 rounded-lg shadow-md flex inline-flex flex-wrap gap-2">
-                            <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded-full">Over 18</button>
-                            <button className="bg-red-200 text-red-800 py-2 px-4 rounded-full">Religious</button>
-                                <button className="bg-blue-200 text-blue-800 py-2 px-4 rounded-full">Multilingual</button>
-                                <button className="bg-yellow-200 text-yellow-800 py-2 px-4 rounded-full">Outreach</button>
-                                <button className="bg-green-200 text-green-800 py-2 px-4 rounded-full">Environment</button>
-                                <button className="bg-orange-200 text-orange-800 py-2 px-4 rounded-full">Minimal Standing</button>
+                            <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Over 18</button>
+                            <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Religious</button>
+                                <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Multilingual</button>
+                                <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Outreach</button>
+                                <button className="bg-slate-400 text-slate-800 py-2 px-4 rounded-full">Environment</button>
+                                <button className="bg-slate-600 text-slate-700 py-2 px-4 rounded-full">Minimal Standing</button>
                             </div>
                         </div>
 
@@ -202,8 +204,11 @@ export default function Userprofile() {
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
-        </div>
+
+
+
         </div>
     );
 }
