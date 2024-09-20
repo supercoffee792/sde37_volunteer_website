@@ -6,7 +6,7 @@ export default function Adminpage() {
 
       <div className="bg-slate-800 min-h-screen overflow-x-hidden">
         <Usernavbar/>
-        <div className="flex flex-col h-[90vh] border border-white rounded-md m-10">
+        <div className="flex h-[90vh] border border-white rounded-md m-10">
             <div className="w-2/3 border-r border-gray-500 text-white p-10">
                 <h2 className="text-white text-2xl mb-5">Events</h2>
                 <form className="text-white">
@@ -52,6 +52,46 @@ export default function Adminpage() {
                     </div>
                     <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">Create Event</button>
                 </form>
+            </div>
+            <div className="w-1/3 text-white text-2xl p-10 overflow-auto">
+                <p className="mb-5">Manage events</p>
+                <button className="w-auto mb-4 bg-gray-600 text-white text-sm p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  Filters...
+                </button>
+                <div className="bg-slate-700 p-6 text-sm rounded-lg shadow-lg">
+                  <h2 className="text-1xl font-semibold text-white mb-6">Events</h2>
+                  <ul className="space-y-6">
+                    <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
+                      <h3 className="text-lg font-medium text-white">Houston Food Bank</h3>
+                      <p className="text-slate-300">Date: 10-15-2024</p>
+                      <p className="text-slate-300">Location: Houston, Texas</p>
+                      <p className="text-slate-300">Description: Food distribution to Greater Houston area</p>
+                      <p className="text-slate-300">Skills Needed: Strong lifter</p>
+                      <p className="text-slate-300">Urgency: Medium</p>
+                    </li>
+                    <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
+                      <h3 className="text-lg font-medium text-white">Houston Marathon Committee</h3>
+                      <p className="text-slate-300">Date: 01-19-2024</p>
+                      <p className="text-slate-300">Location: Houston, Texas</p>
+                      <p className="text-slate-300">Description: Set-up and distribute electrolytes and water at aid-stations</p>
+                      <p className="text-slate-300">Urgency: High</p>
+                    </li>
+                    <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
+                      <h3 className="text-lg font-medium text-white">Park Clean-Up</h3>
+                      <p className="text-slate-300">Date: 09-30-2024</p>
+                      <p className="text-slate-300">Location: Chicago, Illinois</p>
+                      <p className="text-slate-300">Description: Help clean Grant Park</p>
+                      <p className="text-slate-300">Urgency: Medium</p>
+                    </li>
+                    <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
+                      <h3 className="text-lg font-medium text-white">Animal Shelter Volunteer</h3>
+                      <p className="text-slate-300">Date: 12-05-2024</p>
+                      <p className="text-slate-300">Location: New York, New York</p>
+                      <p className="text-slate-300">Description: Play with animals in the shelter to help them socialize</p>
+                      <p className="text-slate-300">Urgency: Low</p>
+                    </li>
+                  </ul>
+              </div>
             </div>
         </div>
 
