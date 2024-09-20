@@ -8,7 +8,7 @@ export default function Userprofile() {
 
             <div className="flex flex-col">
                 {/* Notifications Picture, Name, Bio */}
-                <div className="flex-grow flex pt-8 pr-8 pl-8  ">
+                <div className="flex flex-grow  pt-8 pr-8 pl-8  ">
                     {/* Picture, Name, Bio */}
                     <div className="flex-grow w-3/4 pr-8">
                         {/* Picture and Name */}
@@ -22,6 +22,8 @@ export default function Userprofile() {
                                 type="text"
                                 className="text-4xl text-white font-bold border-none bg-transparent"
                                 placeholder="John Doe"
+                                maxLength={50}
+                                required
                             />
                         </div>
                         {/* Bio */}
@@ -31,7 +33,7 @@ export default function Userprofile() {
                                 <div className="flex space-x-4">
                                     <div className="w-1/2">
                                         <label className="block text-gray-700 text-sm font-bold mb-2">Gender</label>
-                                        <select className="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                                        <select className="w-full p-2 border border-gray-300 rounded bg-gray-100" required>
                                             <option>Male</option>
                                             <option>Female</option>
                                             <option>Non-Binary/Other</option>
@@ -39,7 +41,7 @@ export default function Userprofile() {
                                     </div>
                                     <div className="w-1/2">
                                         <label className="block text-gray-700 text-sm font-bold mb-2">Age</label>
-                                        <select className="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                                        <select className="w-full p-2 border border-gray-300 rounded bg-gray-100" required>
                                             {Array.from({ length: 100 }, (_, i) => (
                                                 <option key={i + 1}>{i + 1}</option>
                                             ))}
@@ -50,19 +52,19 @@ export default function Userprofile() {
                                 <div className="grid grid-cols-6 gap-4">
                                     <div className="col-span-2">
                                         <label className="block text-gray-700 text-sm font-bold mb-2">Address</label>
-                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="123 Main St" />
+                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="123 Main St" maxLength={100} required/>
                                     </div>
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2 overflow-x-hidden">Apt/Unit/Suite</label>
-                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="N/A" />
+                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="N/A" maxLength={100} />
                                     </div>
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2">City</label>
-                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="City" />
+                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="City" maxLength={100} required/>
                                     </div>
                                     <div className="col-span-1">
-                                        <label className="block text-gray-700 text-sm font-bold mb-2">State</label>
-                                        <select className="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                                        <label className="block text-gray-700 text-sm font-bold mb-2"> State </label>
+                                        <select className="w-full p-2 border border-gray-300 rounded bg-gray-100" required >
                                             {['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'].map(state => (
                                                 <option key={state}>{state}</option>
                                             ))}
@@ -70,7 +72,7 @@ export default function Userprofile() {
                                     </div>
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2 overflow-x-hidden">Zip</label>
-                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="12345" />
+                                        <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-100" placeholder="12345" maxLength={100} inputMode={"numeric"} pattern={"[0-9]*"} required/>
                                     </div>
                                 </div>
                             </div>
@@ -78,9 +80,17 @@ export default function Userprofile() {
                     </div>
 
                     {/* Notifications */}
-                    <div className="w-1/4 bg-white p-8 rounded-lg shadow-md flex flex-col max-h-96 ">
+                    <div className="w-1/4 bg-white p-8 rounded-lg shadow-md flex flex-col max-h-96">
                         <h2 className="text-2xl font-semibold overflow-y-hidden pb-6">Notifications</h2>
                         <div className="flex-grow flex-col space-y-4 overflow-y-auto">
+                            <div className="p-4 bg-gray-100 rounded-lg ">
+                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
+                                <span className="text-xs text-gray-500">5 mins ago</span>
+                            </div>
+                            <div className="p-4 bg-gray-100 rounded-lg ">
+                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
+                                <span className="text-xs text-gray-500">5 mins ago</span>
+                            </div>
                             <div className="p-4 bg-gray-100 rounded-lg ">
                                 <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
                                 <span className="text-xs text-gray-500">5 mins ago</span>
