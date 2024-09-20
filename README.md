@@ -3,6 +3,7 @@ To navigate through the website's subdomains, the folders in src/app represent t
 
 ### For example:
 localhost:3000/userprofile goes to the user profile page
+
 localhost:3000/admin goes to the admin page
 
 # -----
