@@ -9,16 +9,21 @@ export default function Adminpage() {
           <h1 className="text-3xl font-bold text-white mb-8">Volunteer-Event Matching</h1>
 
           {/* Filters Section */}
-          <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-4 gap-6 mb-8 items-end">
 
             {/* Skills */}
             <div className="flex flex-col">
               <label htmlFor="Skills" className="text-gray-300 mb-2">Skills</label>
-              <select name="Skills" id="Skills" className="bg-slate-700 text-white p-3 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                <option value="kids">Good with kids</option>
-                <option value="pets">Good with pets</option>
-                <option value="cpr">CPR Certified</option>
-                <option value="strong">Strong lifter</option>
+              <select name="Skills" id="Skills" className="bg-slate-700 text-white p-3 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" multiple size={4}>
+                <option value="Good with pets">Good with pets</option>
+                <option value="Good with kids">Good with kids</option>
+                <option value="Programming">Programming</option>
+                <option value="Leadership">Leadership</option>
+                <option value="CPR certified">CPR certified</option>
+                <option value="Carpentry">Carpentry</option>
+                <option value="Cooking">Cooking</option>
+                <option value="Multilingual">Multilingual</option>
+                <option value="Creative arts">Creative arts</option>
               </select>
             </div>
 
@@ -46,7 +51,7 @@ export default function Adminpage() {
     
             {/* Apply Filters Button */}
             <div className="flex items-end">
-              <button className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <button className="w-auto bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 Apply filters
               </button>
             </div>
