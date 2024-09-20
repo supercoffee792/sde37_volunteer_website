@@ -1,3 +1,12 @@
+## Note:
+To navigate through the website's subdomains, the folders in src/app represent the subdomains to go to (except src/app/components)
+
+### For example:
+localhost:3000/userprofile goes to the user profile page
+localhost:3000/admin goes to the admin page
+
+# -----
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
