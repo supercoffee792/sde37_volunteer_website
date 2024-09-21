@@ -1,6 +1,8 @@
 ## Note:
 To navigate through the website's subdomains, the folders in src/app represent the subdomains to go to (except src/app/components)
 
+You may need to run "npm install run" to install the necessary dependencies
+
 ### For example:
 localhost:3000/userprofile goes to the user profile page
 
