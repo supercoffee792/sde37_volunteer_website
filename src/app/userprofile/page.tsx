@@ -1,7 +1,13 @@
-
+"use client";
 import Usernavbar from "../components/Usernavbar";
+import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 export default function Userprofile() {
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
             <Usernavbar />
@@ -203,12 +209,53 @@ export default function Userprofile() {
                                 </div>
                             </div>
                         </div>
+                        {/* Availability Section */}
+                        <div className="mb-4 flex-col">
+                            <h2 className="text-2xl text-white font-semibold mb-4">Availability</h2>
+                            <div className="bg-white p-6 rounded-lg shadow-md">
+                                <div className="flex space-x-4 mb-4">
+                                    <div className="w-1/2">
+                                        <label className="block text-gray-700 text-sm font-bold mb-2">Start Date</label>
+                                        <DatePicker
+                                            selected={startDate}
+                                            onChange={(date) => setStartDate(date)}
+                                            className="w-full p-2 border border-gray-300 rounded bg-gray-100"
+                                            dateFormat="yyyy/MM/dd"
+                                            placeholderText="Select start date"
+                                        />
+
+
+
+
+
+
+
+                                    </div>
+                                    <div className="w-1/2">
+                                        <label className="block text-gray-700 text-sm font-bold mb-2">End Date</label>
+                                        <DatePicker
+                                            selected={endDate}
+                                            onChange={(date) => setEndDate(date)}
+                                            className="w-full p-2 border border-gray-300 rounded bg-gray-100"
+                                            dateFormat="yyyy/MM/dd"
+                                            placeholderText="Select end date"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-
-
         </div>
     );
+
+    // hi hey
+
+
+
+
+
+
+
 }
