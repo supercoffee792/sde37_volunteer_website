@@ -1,0 +1,44 @@
+# Python bytecode
+**/__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+db.sqlite3
+
+# Media files
+media/
+
+# Static files
+staticfiles/
+static/
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+*.cover
+*.log
+.coverage.*
+nosetests.xml
+coverage.xml
+
+# IDE/editor specific
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db

@@ -1,6 +1,6 @@
 "use client";
 import Usernavbar from "../components/Usernavbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -8,6 +8,25 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function Userprofile() {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+
+    const [users, setUser] = useState([]);
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async() => {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
+            const data = await response.json();
+            setUser(data);
+            console.log(data);
+        } 
+        catch (err) {
+            console.log(err);
+        }
+    };
+
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
             <Usernavbar />
