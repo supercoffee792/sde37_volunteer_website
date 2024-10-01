@@ -1,13 +1,46 @@
 "use client";
 import Usernavbar from "../components/Usernavbar";
 import { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
+const daysOfWeek = [
+    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+  ];
 
 export default function Userprofile() {
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [selectedDay, setSelectedDay] = useState<string | null>(null);
+    const [startTime, setStartTime] = useState<string | null>(null);
+    const [endTime, setEndTime] = useState<string | null>(null);
+    const [availability, setAvailability] = useState<Record<string, { startTime: string | null; endTime: string | null }>>({});
+  
+    const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const day = e.target.value;
+      setSelectedDay(day === "" ? null : day);
+      setStartTime(null);
+      setEndTime(null);
+    };
+  
+    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setStartTime(e.target.value || null);
+    };
+  
+    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEndTime(e.target.value || null);
+    };
+  
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (selectedDay && startTime && endTime) {
+        setAvailability(prev => ({
+          ...prev,
+          [selectedDay]: { startTime, endTime }
+        }));
+        // Reset the form
+        setSelectedDay(null);
+        setStartTime(null);
+        setEndTime(null);
+      }
+    };
+  
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
             <Usernavbar />
@@ -211,51 +244,65 @@ export default function Userprofile() {
                         </div>
                         {/* Availability Section */}
                         <div className="mb-4 flex-col">
-                            <h2 className="text-2xl text-white font-semibold mb-4">Availability</h2>
-                            <div className="bg-white p-6 rounded-lg shadow-md">
-                                <div className="flex space-x-4 mb-4">
-                                    <div className="w-1/2">
-                                        <label className="block text-gray-700 text-sm font-bold mb-2">Start Date</label>
-                                        <DatePicker
-                                            selected={startDate}
-                                            onChange={(date) => setStartDate(date)}
-                                            className="w-full p-2 border border-gray-300 rounded bg-gray-100"
-                                            dateFormat="yyyy/MM/dd"
-                                            placeholderText="Select start date"
-                                        />
+              <h2 className="text-2xl text-white font-semibold mb-4">Availability</h2>
+              <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+                <label>
+                  Choose a day:
+                  <select value={selectedDay || ""} onChange={handleDayChange} className="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                    <option value="">Select a day</option>
+                    {daysOfWeek.map((day) => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                </label>
 
+                {selectedDay && (
+                  <div>
+                    <label className="block mt-4">
+                      Start Time:
+                      <input
+                        type="time"
+                        value={startTime || ""}
+                        onChange={handleStartTimeChange}
+                        required
+                        className="w-full p-2 border border-gray-300 rounded bg-gray-100"
+                      />
+                    </label>
+                    <label className="block mt-4">
+                      End Time:
+                      <input
+                        type="time"
+                        value={endTime || ""}
+                        onChange={handleEndTimeChange}
+                        required
+                        className="w-full p-2 border border-gray-300 rounded bg-gray-100"
+                      />
+                    </label>
+                  </div>
+                )}
 
+                <button type="submit" className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
+                  Set Availability
+                </button>
+              </form>
 
-
-
-
-
-                                    </div>
-                                    <div className="w-1/2">
-                                        <label className="block text-gray-700 text-sm font-bold mb-2">End Date</label>
-                                        <DatePicker
-                                            selected={endDate}
-                                            onChange={(date) => setEndDate(date)}
-                                            className="w-full p-2 border border-gray-300 rounded bg-gray-100"
-                                            dateFormat="yyyy/MM/dd"
-                                            placeholderText="Select end date"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              <h3 className="mt-6 text-lg font-semibold">Current Availability:</h3>
+              <ul>
+                {Object.entries(availability).map(([day, times]) => (
+                  <li key={day} className="mt-1 text-white">
+                    {day}: {times.startTime} - {times.endTime}
+                  </li>
+                ))}
+              </ul>
             </div>
+          </div>
+
         </div>
-    );
+    </div>
 
-    // hi hey
-
-
+</div>
 
 
-
-
+);
 
 }
