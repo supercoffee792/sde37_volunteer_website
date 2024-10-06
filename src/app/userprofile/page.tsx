@@ -51,7 +51,57 @@ const ageRanges = [
     "61+"
 ]
 
-export default function Userprofile() {
+interface VolunteerData { // data types expected when creating event object
+    id: number;
+    pfp: string;
+    username: string;
+    gender: string;
+    age: string;
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    zipcode: string;
+    
+};
+
+const initialState = {
+    bio: {
+      gender: '',
+      age: '',
+      address1: '',
+      address2: '',
+      city: '',
+      state: '',
+      zipcode: '',
+    },
+    skills: [],
+    preferences: '',
+    availability: {
+      selectedDay: '',
+      startTime: '',
+      endTime: '',
+    },
+  };
+
+export default function Userprofile() {   
+    const [volunteers, setVolunteers] = useState<VolunteerData[]>([]); 
+
+    useEffect(() => {
+        fetchVolunteers();
+    }, []);
+
+    const fetchVolunteers = async() => {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
+            const data = await response.json();
+            setVolunteers(data);
+        } 
+        catch (err) {
+            console.log(err);
+        }
+    };
+    
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const [startTime, setStartTime] = useState<string | null>(null);
     const [endTime, setEndTime] = useState<string | null>(null);
@@ -86,14 +136,15 @@ export default function Userprofile() {
       }
     };
 
+
     {/* Picture and Name */}
     const [profileData, setProfile] = useState({
         username: 'John Doe',
-        img: bearImage.src
+        pfp: bearImage.src
     });
     const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
     const [newName, setNewName] = useState(profileData.username);
-    const [selectedImage, setSelectedImage] = useState(profileData.img)
+    const [selectedImage, setSelectedImage] = useState(profileData.pfp)
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = e.target.value;
@@ -123,6 +174,7 @@ export default function Userprofile() {
     };
 
     {/* Bio */}
+
     const [bioData, setBio] = useState({
         gender: 'Male',
         age: "21-30",
@@ -130,14 +182,22 @@ export default function Userprofile() {
         address2: '',
         city: 'Huntsville',
         state: 'AL',
-        zip: 12345
+        zipcode: '12345'
 
     });
-
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [newBio, setNewBio] = useState(bioData);
 
-    const handleInputBioChange = (e) => {
+
+    const handleInputBioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewBio(prevState => ({
+        ...prevState,
+        [name]: value
+        }));
+    };
+
+    const handleSelectBioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
         setNewBio(prevState => ({
         ...prevState,
@@ -188,7 +248,6 @@ export default function Userprofile() {
     };
     
 
-
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
             <Usernavbar />
@@ -211,7 +270,7 @@ export default function Userprofile() {
                                     </select>
                                 ) : (
                                     <div className="overflow-hidden w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
-                                        <img src={profileData.img} alt="ProfileImg" className="w-full h-full object-cover"/>
+                                        <img src={profileData.pfp} alt="ProfileImg" className="w-full h-full object-cover"/>
                                     </div>
                                 )}
 
@@ -257,7 +316,7 @@ export default function Userprofile() {
                                     <div className="w-1/2">
                                         <label className="block text-gray-700 text-sm font-bold mb-2">Gender</label>
                                         {isEditingBio ? (
-                                        <select name="gender" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleInputBioChange} value={newBio.gender} required>
+                                        <select name="gender" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleSelectBioChange} value={newBio.gender} required>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                             <option value="Other">Non-Binary/Other</option>
@@ -270,7 +329,7 @@ export default function Userprofile() {
                                     <div className="w-1/2">
                                         <label className="block text-gray-700 text-sm font-bold mb-2">Age</label>
                                         {isEditingBio ? (
-                                            <select name="age" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleInputBioChange} value={newBio.age} required>
+                                            <select name="age" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleSelectBioChange} value={newBio.age} required>
                                                 {ageRanges.map((age) => (
                                                     <option key={age} value={age}>{age}
                                                     </option>
@@ -323,7 +382,7 @@ export default function Userprofile() {
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2"> State </label>
                                         {isEditingBio ? (
-                                            <select name="state" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleInputBioChange} value={newBio.state} required >
+                                            <select name="state" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleSelectBioChange} value={newBio.state} required >
                                                 {['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'].map(state => (
                                                     <option key={state} value={state}>{state}</option>
                                                 ))}
@@ -335,9 +394,9 @@ export default function Userprofile() {
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2 overflow-x-hidden">Zip</label>
                                         {isEditingBio ? (
-                                            <input type="text" name="zip" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.zip}onChange={handleInputBioChange} maxLength={9} minLength={5} inputMode={"numeric"} pattern={"[0-9]*"} required/>
+                                            <input type="text" name="zip" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.zipcode}onChange={handleInputBioChange} maxLength={9} minLength={5} inputMode={"numeric"} pattern={"[0-9]*"} required/>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.zip}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.zipcode}</p>
                                         )}
                                     </div>
                                 </div>
