@@ -5,7 +5,7 @@ class VolunteerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Volunteer
         fields = '__all__'
-
+        
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
