@@ -52,7 +52,7 @@ def manage_event(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     elif request.method == 'PUT':
         event_data = request.data
-        serializer = EventSerializer(data=event_data)
+        serializer = EventSerializer(event, data=event_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

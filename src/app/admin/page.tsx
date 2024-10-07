@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import Usernavbar from "../components/Usernavbar";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useRef } from "react";
+import { it } from "node:test";
 
 interface EventData { // data types expected when creating event object
   id: number;
@@ -23,6 +24,83 @@ export default function Adminpage() {
     const [urgency, setUrgency] = useState<string>("");
     const [skills, setSkills] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
+
+    // Event update attribute states
+    const [newName, setNewName] = useState<string>("");
+    const [newDate, setNewDate] = useState<string>("");
+    const [newLocation, setNewLocation] = useState<string>("");
+    const [newUrgency, setNewUrgency] = useState<string>("");
+    const [newSkills, setNewSkills] = useState<string[]>([]);
+    const [newDescription, setNewDescription] = useState<string>("");
+
+    // pop up form status
+    const [popupOpen, setPopupOpen] = useState(false);
+    const [togglePopup, setTogglePopup] = useState(false);
+    const [currID, setCurrID] = useState<number | null>(null);
+
+    const nameInputRef = useRef<HTMLInputElement>(null);
+    const dateInputRef = useRef<HTMLInputElement>(null);
+    const locationInputRef = useRef<HTMLInputElement>(null);
+    const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleOpen = (pk: number) => {
+      const itemToEdit = events.find(item => item.id == pk);
+      
+      if (itemToEdit) {
+        setNewName(itemToEdit.name);
+        setNewDate(itemToEdit.date);
+        setNewLocation(itemToEdit.location);
+        setNewDescription(itemToEdit.description);
+        setCurrID(pk);
+        setPopupOpen(true);
+        setTogglePopup(prev => !prev);
+      }
+      else {
+        console.log("Cant find item");
+      }
+    };
+
+    const handleClose = () => {
+      setPopupOpen(false);
+      // setCurrID(null);
+    };
+
+    const handleFormChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { target } = event;
+      
+      if (nameInputRef.current) {
+        setNewName(nameInputRef.current!.value);
+      }
+      if (dateInputRef.current) {
+        setNewDate(dateInputRef.current!.value);
+      }
+      if (locationInputRef.current) {
+        setNewLocation(locationInputRef.current!.value);
+      }
+      if (descriptionInputRef.current) {
+        setNewDescription(descriptionInputRef.current!.value);
+      }
+    };
+
+    useEffect(() => {
+      const itemToEdit = events.find(item => item.id === currID);
+      if (!itemToEdit) {
+        console.log("Event not found");
+        return;
+      }
+      if (nameInputRef.current) {
+        nameInputRef.current.value = itemToEdit.name;
+      }
+      if (dateInputRef.current) {
+        dateInputRef.current.value = itemToEdit.date;
+      }
+      if (locationInputRef.current) {
+        locationInputRef.current.value = itemToEdit.location;
+      }
+      if (descriptionInputRef.current) {
+        descriptionInputRef.current.value = itemToEdit.description;
+      }
+    }, [currID, events, togglePopup]);
 
     useEffect(() => {
         fetchEvents();
@@ -52,6 +130,19 @@ export default function Adminpage() {
 
         setSkills(selectedValues);
     };
+
+    /*const handleNewSkillsSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const { options } = event.target;
+        const selectedValues: string[] = [];
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                selectedValues.push(options[i].value);
+            }
+        }
+
+        setNewSkills(selectedValues);
+    };*/
 
     const handleAddEventSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -83,13 +174,52 @@ export default function Adminpage() {
         }
     };
 
+    const handleUpdateEventSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        console.log("this worked");
+
+        const original = events.find(item => item.id === currID);
+        if (!original) {
+          console.log("Event not found");
+          return;
+        }
+
+        const t_skills = original.skills;
+        const eventNewData = {
+          name: newName,
+          date: newDate,
+          location: newLocation,
+          urgency: original.urgency,
+          skills: t_skills,
+          description: newDescription,
+        };
+
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/api/events/${currID}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(eventNewData),
+          });
+    
+          const t_data: EventData = await response.json();
+          setEvent((prev) => prev.map((item) => item.id == currID ? t_data : item)); // update event list after update change
+          setPopupOpen(false);
+        }
+        catch (err) {
+          console.log(err);
+          setPopupOpen(false);
+        }
+    };
+
     const deleteEvent = async(pk: number) => {
         try {
           const response = await fetch(`http://127.0.0.1:8000/api/events/${pk}`, {
             method: "DELETE",
           });
     
-          setEvent((prev) => prev.filter((item) => item.id !== pk));
+          setEvent((prev) => prev.filter((item) => item.id !== pk)); // update event list after delete change
         } 
         catch (err) {
           console.log(err);
@@ -164,11 +294,17 @@ export default function Adminpage() {
 
                     {events.map((item) => (
                       <li key={item.id} className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                        <div className="flex">
+                        <div className="flex justify-between">
                          <h3 className="text-lg font-medium text-white">{item.name}</h3>
-                         <button onClick={() => deleteEvent(item.id)} className="w-auto ml-auto bg-gray-800 text-white text-sm p-2 rounded-md hover:bg-red-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            Delete Event
-                          </button>
+                         <div className="space-x-2">
+                          <button onClick = {() => handleOpen(item.id)} className="w-auto ml-auto bg-gray-800 text-white text-sm p-2 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                              Update Event
+                            </button>
+                              
+                          <button onClick={() => deleteEvent(item.id)} className="w-auto ml-auto bg-gray-800 text-white text-sm p-2 rounded-md hover:bg-red-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                              Delete Event
+                            </button>
+                        </div>
                         </div>
                         <p className="text-slate-300">Date: {item.date}</p>
                         <p className="text-slate-300">Location: {item.location}</p>
@@ -177,6 +313,42 @@ export default function Adminpage() {
                         <p className="text-slate-300">Urgency: {item.urgency}</p>
                       </li>
                     ))}
+
+                    {
+                        popupOpen && 
+                        <div className="fixed inset-0 m-0 flex items-center justify-center bg-black bg-opacity-20 max-w-screen ">
+                          <div className="flex flex-col bg-slate-600 rounded-lg p-8 w-1/2">
+                            <div className="flex justify-between">
+                              <h2 className="text-3xl font-bold text-white mb-5">Update Event</h2>
+                              <button onClick={() => handleClose()} className="text-1xl bg-red-600 px-2 rounded-md">Close</button>
+                            </div>
+
+                            <form onSubmit={handleUpdateEventSubmit} className="text-white">
+                              <div className="mb-4">
+                                  <label htmlFor="event-name" className="">Event Name</label>
+                                  <input type="text" id="event-name" max-length="100" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" 
+                                    onChange={handleFormChange} ref={nameInputRef} required />
+                              </div>
+                              <div className="mb-4">
+                                  <label htmlFor="event-date" className="">Date</label>
+                                  <input type="date" id="event-date" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" placeholder="mm/dd/yy" 
+                                  onChange={handleFormChange} ref={dateInputRef} required />
+                              </div>
+                              <div className="mb-4">
+                                  <label htmlFor="event-location" className="">Location</label>
+                                  <input type="text" id="event-location" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" 
+                                  onChange={handleFormChange} ref={locationInputRef} required />
+                              </div>      
+                              <div className="mb-4">
+                                  <label htmlFor="event-description" className="">Description</label>
+                                  <textarea id="event-description" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2"
+                                  onChange={handleFormChange} ref={descriptionInputRef} required></textarea>
+                              </div>
+                              <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">Update Event</button>
+                            </form>
+                          </div>
+                        </div>
+                      }
                     
                   </ul>
               </div>
