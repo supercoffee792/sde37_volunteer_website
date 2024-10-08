@@ -13,7 +13,7 @@ const Navbar = () => {
                     </nav>
                     <nav>
                         <ul className="flex space-x-6">
-                            <li><Link href="/" className="hover:underline">Find Events</Link></li>
+                            <li><Link href="/findevents" className="hover:underline">Find Events</Link></li>
                         </ul>
                     </nav>
                 </div>

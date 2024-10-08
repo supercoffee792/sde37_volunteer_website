@@ -356,7 +356,7 @@ export default function Adminpage() {
         </div>
 
         <div className="flex flex-col h-full min-h-screen border border-gray-700 rounded-lg m-10 p-6 bg-slate-800 shadow-lg">
-          <h1 className="text-3xl font-bold text-white mb-8">Volunteer-Event Matching</h1>
+          <h1 className="text-3xl font-bold text-white mb-8">Manage Events</h1>
 
           {/* Filters Section */}
           <div className="grid grid-cols-4 gap-6 mb-8 items-end">
@@ -410,9 +410,34 @@ export default function Adminpage() {
           {/* Volunteers and Events Section */}
           <div className="grid grid-cols-2 gap-6">
 
+            {/* Events List */}
+            <div className="bg-slate-700 p-6 rounded-lg shadow-lg">
+              <h2 className="text-2xl font-semibold text-white mb-6">Event</h2>
+              <ul className="space-y-6">
+
+                {events.map((item) => (
+                  <li key={item.id} className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
+                    <h3 className="text-lg font-medium text-white">{item.name}</h3>
+                    <p className="text-slate-300">Date: {item.date}</p>
+                    <p className="text-slate-300">Location: {item.location}</p>
+                    <p className="text-slate-300">Description: {item.description}</p>
+                    <p className="text-slate-300">Skills Needed: {item.skills} </p>
+                    <p className="text-slate-300">Urgency: {item.urgency}</p>
+                  </li>
+                  // Add 'send notifications' button with modal that accepts text
+
+
+                  // Do volunteer-event matching module
+                  // Use foreign keys?? Volunteers foreign key pointing to events' volunteer list
+                ))}
+                
+              </ul>
+            </div>
+
             {/* Volunteers List */}
             <div className="bg-slate-700 p-6 rounded-lg shadow-lg">
               <h2 className="text-2xl font-semibold text-white mb-6">Volunteers</h2>
+              <button className="w-auto mb-4 bg-gray-600 text-white text-sm p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">Send Alert to Volunteers</button>
               <ul className="space-y-6">
                 <li className="flex items-center bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
                   <img src="https://picsum.photos/200" alt="placeholder" className="w-14 h-14 rounded-full mr-4"/>
@@ -448,42 +473,8 @@ export default function Adminpage() {
                 </li>
               </ul>
             </div>
+        
           
-            {/* Events List */}
-            <div className="bg-slate-700 p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-white mb-6">Events</h2>
-              <ul className="space-y-6">
-                <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <h3 className="text-lg font-medium text-white">Houston Food Bank</h3>
-                  <p className="text-slate-300">Date: 10-15-2024</p>
-                  <p className="text-slate-300">Location: Houston, Texas</p>
-                  <p className="text-slate-300">Description: Food distribution to Greater Houston area</p>
-                  <p className="text-slate-300">Skills Needed: Strong lifter</p>
-                  <p className="text-slate-300">Urgency: Medium</p>
-                </li>
-                <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <h3 className="text-lg font-medium text-white">Houston Marathon Committee</h3>
-                  <p className="text-slate-300">Date: 01-19-2024</p>
-                  <p className="text-slate-300">Location: Houston, Texas</p>
-                  <p className="text-slate-300">Description: Set-up and distribute electrolytes and water at aid-stations</p>
-                  <p className="text-slate-300">Urgency: High</p>
-                </li>
-                <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <h3 className="text-lg font-medium text-white">Park Clean-Up</h3>
-                  <p className="text-slate-300">Date: 09-30-2024</p>
-                  <p className="text-slate-300">Location: Chicago, Illinois</p>
-                  <p className="text-slate-300">Description: Help clean Grant Park</p>
-                  <p className="text-slate-300">Urgency: Medium</p>
-                </li>
-                <li className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <h3 className="text-lg font-medium text-white">Animal Shelter Volunteer</h3>
-                  <p className="text-slate-300">Date: 12-05-2024</p>
-                  <p className="text-slate-300">Location: New York, New York</p>
-                  <p className="text-slate-300">Description: Play with animals in the shelter to help them socialize</p>
-                  <p className="text-slate-300">Urgency: Low</p>
-                </li>
-              </ul>
-            </div>
           </div>
 
         
