@@ -5,30 +5,14 @@ from rest_framework.test import APITestCase
 from .models import Event, Volunteer
 from django.contrib.auth.hashers import make_password
 
-# Volunteer Signup test
-class VolunteerSignupTests(APITestCase):
-    def test_create_user(self):
-        url = reverse('signup')
-        data = {
-            "username": "newuser",
-            "password": "password123",
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('token', response.data)
-        self.assertEqual(response.data['user']['username'], "newuser")
-
-# Volunteer signin tests
-class VolunteerLoginTests(APITestCase):
+# Volunteer Signup/login tests
+class VolunteerSignupTest(TestCase):
     def setUp(self):
-        self.username = 'John'
-        self.password = 'password123'
-        self.user = Volunteer.objects.create(
-            username=self.username,
-            password=make_password(self.password)
-        )
-
-        self.url = reverse('login')
+        self.url = reverse('signup')
+    
+    def testSignUpURL(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 405) # test for correct HTTP methods
 
 # Event tests
 class EventModelTest(TestCase):

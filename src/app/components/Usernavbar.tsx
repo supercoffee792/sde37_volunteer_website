@@ -1,6 +1,10 @@
 import Link from "next/link"
 
-const Navbar = () => {
+interface NavbarProps {
+    onLogout: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     return (
         <nav className="bg-slate-800 text-white w-full top-0 left-0 border-b border-gray-500">
             <div className="container mx-auto flex justify-between items-center p-4">
@@ -19,7 +23,7 @@ const Navbar = () => {
                 </div>
                 <nav>
                     <ul className="flex space-x-6">
-                        <li><Link href="/signin" className="hover:underline border p-2 rounded-md bg-white text-black">Log Out</Link></li>
+                        <li><button onClick={onLogout} className="hover:underline border p-2 rounded-md bg-white text-black">Log Out</button></li>
                     </ul>
                 </nav>
             </div>

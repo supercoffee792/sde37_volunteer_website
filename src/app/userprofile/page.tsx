@@ -54,16 +54,27 @@ const ageRanges = [
 
 interface VolunteerData { // data types expected when creating event object
     id: number;
-    pfp: string;
-    username: string;
-    gender: string;
-    age: string;
     address1: string;
     address2: string;
+    age: string;
     city: string;
+    date_joined: string;
+    email: string;
+    first_name: string;
+    gender: string;
+    is_active: boolean;
+    is_staff: boolean;
+    is_superuser: boolean;
+    last_login: string | null;
+    last_name: string;
+    notififications: string;
+    pfp: string;
+    preferences: string;
+    profilename: string;
+    skills: string;
     state: string;
+    username: string;
     zipcode: string;
-    
 };
 
 const initialState = {
@@ -87,7 +98,7 @@ const initialState = {
 
 export default function Userprofile() {   
     // login stuff
-    const [username, setUsername] = useState<string>("");
+    // const [username, setUsername] = useState<string>("");
     const [loginUser, setLoginUser] = useState<VolunteerData | null>(null);
     const [isLogin, setLogin] = useState<boolean>(false);
     const router = useRouter();
@@ -107,13 +118,12 @@ export default function Userprofile() {
                 setLogin(true);
             }
             catch(err) {
-                setUsername("");
                 setLogin(false);
                 console.log(err);
             }
         };
         checkLoginStatus()
-    }, []);
+    }, [loginUser, isLogin]);
 
     const volunteerLogout = async () => {
         try {
@@ -309,7 +319,7 @@ export default function Userprofile() {
 
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
-            <Usernavbar />
+            <Usernavbar onLogout={volunteerLogout}/>
 
             <div className="flex flex-col">
                 {/* Notifications Picture, Name, Bio */}
@@ -341,11 +351,11 @@ export default function Userprofile() {
                                         className="m-2 text-4xl text-white font-bold border-none bg-transparent"
                                         maxLength={50}
                                         required
-                                        value={newName}
+                                        value={loginUser ? loginUser.username : "John Doe"}
                                         onChange = {handleInputProfileChange}
                                         />
                                     ) : (
-                                        <p className="m-2 text-4xl text-white font-bold border-black bg-transparent">{profileData.username}</p>
+                                        <p className="m-2 text-4xl text-white font-bold border-black bg-transparent">{loginUser ? loginUser.username : "John Doe"}</p>
                                     )}
                                     </div>
                                     {isEditingProfile ? (
@@ -665,7 +675,6 @@ export default function Userprofile() {
                 ))}
               </ul>
             </div>
-            <button onClick={volunteerLogout} className="text-white">Logout</button>
           </div>
 
         </div>
