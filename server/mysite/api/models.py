@@ -1,7 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, AbstractUser
+from django.conf import settings
+from rest_framework.authtoken.models import Token as BaseToken
 import datetime
 
-class Volunteer(models.Model):
+class Volunteer(AbstractUser):
     VOLUNTEER_GENDER = {
         ('Male', 'male'), ('Female', 'female'), ('Non-binary/Other', 'non_binary_other')
     }
@@ -37,7 +40,7 @@ class Volunteer(models.Model):
     ]
     
     pfp = models.ImageField(upload_to='profile_pictures/', choices=PFP, default='bear.png') 
-    username = models.CharField(max_length=50, default='John Doe')
+    profilename = models.CharField(max_length=50, default='John Doe')
     gender = models.CharField(max_length=16, choices=VOLUNTEER_GENDER, default="Male")
     age = models.CharField(max_length=8, choices=AGE, default = "21-30")
     address1 = models.CharField(max_length=100, default="123 Main Street")
@@ -45,6 +48,11 @@ class Volunteer(models.Model):
     state = models.CharField(max_length=2, choices=STATE, default = "AL")
     city = models.CharField(max_length=100, default="Huntsville")
     zipcode = models.CharField(max_length=9, default = "12345")
+
+    # User credentials
+    username = models.CharField(max_length=100, unique=True)
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
     
     skills = models.TextField(blank=True)
     preferences = models.TextField(blank=True)
@@ -57,6 +65,9 @@ class Volunteer(models.Model):
 
     def set_skills_list(self, skills):
         self.skills = ','.join(skills)
+
+# class Token(BaseToken):
+    # volunteer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tokens')
 
     
 # class EventHistory(models.Model):

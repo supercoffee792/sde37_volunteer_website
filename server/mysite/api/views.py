@@ -2,9 +2,66 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Volunteer, Event
-from .serializers import VolunteerSerializer, EventSerializer
+from .serializers import VolunteerSerializer, VolunteerSignupSerializer, EventSerializer, VolunteerLoginSerializer
 from rest_framework.views import APIView
+from django.utils import timezone
+
+# Login / Signup operations
+@api_view(['POST'])
+def login(request):
+    volunteer_data = request.data
+    serializer = VolunteerLoginSerializer(data=volunteer_data)
+    if serializer.is_valid():
+        user = serializer.validated_data
+        serializer = VolunteerSerializer(user)
+        token = RefreshToken.for_user(user)
+        data = serializer.data
+        data["tokens"] = {"refresh":str(token), "access": str(token.access_token)}
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def signup(request):
+    volunteer_data = request.data
+    serializer = VolunteerSignupSerializer(data=volunteer_data)
+    if serializer.is_valid():
+        user = serializer.save()
+        token = RefreshToken.for_user(user)
+        data = serializer.data
+        data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}
+        return Response(data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class VolunteerLogout(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+class VolunteerTokenInfo(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = VolunteerSerializer
+
+    def get(self, request, *args, **kwargs):
+        volunteer_info = self.get_volunteer_info()
+        serializer = self.get_serializer(volunteer_info)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_volunteer_info(self):
+        return self.request.user
 
 # Volunteer view operations
 @api_view(['GET'])
@@ -35,7 +92,7 @@ def manage_volunteer(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     elif request.method == 'PUT':
         volunteer_data = request.data
-        serializer = VolunteerSerializer(data=event_data)
+        serializer = VolunteerSerializer(data=volunteer_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

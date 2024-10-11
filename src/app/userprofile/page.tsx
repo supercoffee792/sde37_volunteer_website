@@ -2,6 +2,7 @@
 import Usernavbar from "../components/Usernavbar";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import bearImage from '../images/bear.png';
@@ -85,6 +86,64 @@ const initialState = {
   };
 
 export default function Userprofile() {   
+    // login stuff
+    const [username, setUsername] = useState<string>("");
+    const [loginUser, setLoginUser] = useState<VolunteerData | null>(null);
+    const [isLogin, setLogin] = useState<boolean>(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const token = localStorage.getItem("access_token");
+                const response = await fetch('http://127.0.0.1:8000/api/volunteer_info', {
+                    headers: {
+                        "Authorization":`Bearer ${token}`,
+                    },
+                });
+
+                const data = await response.json();
+                setLoginUser(data);
+                setLogin(true);
+            }
+            catch(err) {
+                setUsername("");
+                setLogin(false);
+                console.log(err);
+            }
+        };
+        checkLoginStatus()
+    }, []);
+
+    const volunteerLogout = async () => {
+        try {
+            const a_token = localStorage.getItem("access_token");
+            const r_token = localStorage.getItem("refresh_token");
+
+            if (r_token && a_token) {
+                const response = await fetch('http://127.0.0.1:8000/api/logout/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization":`Bearer ${a_token}`,
+                    },
+                    body: JSON.stringify({ refresh: r_token }),
+                });
+
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                setLogin(false);
+                setLoginUser(null);
+                console.log("logged out");
+                router.push('/signin');
+            }
+        }
+        catch(err) {
+            console.log("Can't logout");
+            console.log(err);
+        }
+    };
+    
     const [volunteers, setVolunteers] = useState<VolunteerData[]>([]); 
 
     useEffect(() => {
@@ -606,6 +665,7 @@ export default function Userprofile() {
                 ))}
               </ul>
             </div>
+            <button onClick={volunteerLogout} className="text-white">Logout</button>
           </div>
 
         </div>
