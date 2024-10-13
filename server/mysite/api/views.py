@@ -131,6 +131,6 @@ def manage_event(request, pk):
         serializer = EventSerializer(event, data=event_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

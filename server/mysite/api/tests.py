@@ -7,12 +7,41 @@ from django.contrib.auth.hashers import make_password
 
 # Volunteer Signup/login tests
 class VolunteerSignupTest(TestCase):
-    def setUp(self):
-        self.url = reverse('signup')
-    
-    def testSignUpURL(self):
-        response = self.client.get(self.url)
+    def testSignUpExists(self):
+        url = reverse('signup')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 405) # test for correct HTTP methods
+
+    def testSignup(self):
+        url = reverse('signup')
+        data = {
+            'username': 'testuser',
+            'password': 'testpassword123',
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Volunteer.objects.filter(username='testuser').exists())
+
+    def testLoginExists(self):
+        url = reverse('login')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405) # test for correct HTTP methods
+
+    def testLogin(self):
+        url = reverse('login')
+
+        volunteer = Volunteer.objects.create_user(
+            username="testuser",
+            password="password123"
+        )
+
+        data = {
+            'username': 'testuser',
+            'password': 'password123',
+        }
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 # Event tests
 class EventModelTest(TestCase):
@@ -49,3 +78,63 @@ class EventViewTest(TestCase):
     def testEventUrlExists(self):
         response = self.client.get('/api/events/')
         self.assertEqual(response.status_code, 200)
+    
+    def test_num_events(self):
+        num_events = 5
+        for event_id in range(1, num_events + 1):
+            example = Event.objects.get(id=event_id)
+            self.assertEqual(example.id, event_id)
+
+class EventAPITest(APITestCase):
+    def test_post_view(self): # Create event view
+        url = reverse('create_events')
+
+        data = {
+            'name': 'test',
+            'date': '2024-09-30', 
+            'location': 'America', 
+            'urgency': 'Urgent', 
+            'skills': 'Strong lifter', 
+            'description': 'stuff'
+        }
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['name'], 'test')
+
+    def test_put_view(self): # Manage event view
+        event = Event.objects.create(
+            name="Example event", 
+            date="2024-09-30", 
+            location="America", 
+            urgency="Urgent", 
+            skills="Strong lifter", 
+            description="stuff"
+        )
+
+        url = reverse('manage_event', args=[event.id])
+        update_data = {
+            'name': 'Event 2',
+            'date': '2024-09-30', 
+            'location': 'America', 
+            'urgency': 'Urgent', 
+            'skills': 'Strong lifter', 
+            'description': 'stuff'
+        }
+        
+        response = self.client.put(url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_view(self): # Manage events delete
+        event = Event.objects.create(
+            name="Example event", 
+            date="2024-09-30", 
+            location="America", 
+            urgency="Urgent", 
+            skills="Strong lifter", 
+            description="stuff"
+        )
+
+        url = reverse('manage_event', args=[event.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

@@ -21,8 +21,13 @@ class VolunteerSignupSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        user_permissions = validated_data.pop('user_permissions', [])
+        groups = validated_data.pop('groups', [])
         password = validated_data.pop('password')
-        return Volunteer.objects.create_user(password=password, **validated_data)
+        volunteer = Volunteer.objects.create_user(password=password, **validated_data)
+        volunteer.groups.set(groups)
+        volunteer.user_permissions.set(user_permissions)
+        return volunteer
 
 class VolunteerLoginSerializer(serializers.Serializer):
     username = serializers.CharField()

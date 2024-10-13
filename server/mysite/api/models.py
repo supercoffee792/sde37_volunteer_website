@@ -66,9 +66,6 @@ class Volunteer(AbstractUser):
     def set_skills_list(self, skills):
         self.skills = ','.join(skills)
 
-# class Token(BaseToken):
-    # volunteer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tokens')
-
     
 # class EventHistory(models.Model):
 #     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='event_history')
