@@ -18,14 +18,14 @@ const daysOfWeek = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
 ];
 
-const images = [
-{ label: 'bear', value: 'bear', src: bearImage.src },
-{ label: 'bird', value: 'bird', src: birdImage.src },
-{ label: 'chameleon', value: 'chameleon', src: chameleonImage.src },
-{ label: 'frog', value: 'frog', src: frogImage.src },
-{ label: 'raccoon', value: 'raccoon', src: raccoonImage.src },
-{ label: 'turtle', value: 'turtle', src: turtleImage.src }
-];
+const images = [ 'bear.png', 'bird.png', 'chameleon.png', 'frog.png', 'raccoon.png', 'turtle.png']
+// { label: 'bear', value: 'bear.png', src: bearImage.src },
+// { label: 'bird', value: 'bird.png', src: birdImage.src },
+// { label: 'chameleon', value: 'chameleon.png', src: chameleonImage.src },
+// { label: 'frog', value: 'frog.png', src: frogImage.src },
+// { label: 'raccoon', value: 'raccoon.png', src: raccoonImage.src },
+// { label: 'turtle', value: 'turtle.png', src: turtleImage.src }
+// ];
 
 const availableSkills = [
     "Problem solving",
@@ -96,6 +96,8 @@ const initialState = {
     },
   };
 
+const PFP_PATH = "../images"
+
 export default function Userprofile() {   
     // login stuff
     // const [username, setUsername] = useState<string>("");
@@ -154,28 +156,49 @@ export default function Userprofile() {
         }
     };
     
-    const [volunteers, setVolunteers] = useState<VolunteerData[]>([]); 
+    // const [volunteers, setVolunteers] = useState<VolunteerData[]>([]); 
 
-    useEffect(() => {
-        fetchVolunteers();
-    }, []);
+    // useEffect(() => {
+    //     fetchVolunteers();
+    // }, []);
 
-    const fetchVolunteers = async() => {
-        try {
-            const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
-            const data = await response.json();
-            setVolunteers(data);
-        } 
-        catch (err) {
-            console.log(err);
-        }
-    };
+    // const fetchVolunteers = async() => {
+    //     try {
+    //         const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
+    //         const data = await response.json();
+    //         setVolunteers(data);
+    //     } 
+    //     catch (err) {
+    //         console.log(err);
+    //     }
+    // };
+
+    const [profileData, setProfile] = useState({
+        profilename: loginUser ? loginUser.profilename : "John Doe",
+        pfp: loginUser ? loginUser.pfp : "bear.png"
+    });
+    const [bioData, setBio] = useState({
+        gender: loginUser ? loginUser.gender : "Male",
+        age: loginUser ? loginUser.age : "21-30",
+        address1: loginUser ? loginUser.address1 : "123 Main Streeet",
+        address2: loginUser ? loginUser.address2 : "",
+        city: loginUser ? loginUser.city : "Huntsville",
+        state: loginUser ? loginUser.state : 'AL',
+        zipcode: loginUser ? loginUser.zipcode : "12345"
+    });
+    const [skills, setSkills] = useState<string[]>(
+        loginUser && Array.isArray(loginUser.skills) ? loginUser.skills : []
+      );
+    const [preferencesData, setPreferencesData] = useState<string>("");
+
+
     
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const [startTime, setStartTime] = useState<string | null>(null);
     const [endTime, setEndTime] = useState<string | null>(null);
     const [availability, setAvailability] = useState<Record<string, { startTime: string | null; endTime: string | null }>>({});
   
+    {/* Availability */}
     const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const day = e.target.value;
       setSelectedDay(day === "" ? null : day);
@@ -207,53 +230,70 @@ export default function Userprofile() {
 
 
     {/* Picture and Name */}
-    const [profileData, setProfile] = useState({
-        username: 'John Doe',
-        pfp: bearImage.src
-    });
     const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
-    const [newName, setNewName] = useState(profileData.username);
+    const [newName, setNewName] = useState(profileData.profilename);
     const [selectedImage, setSelectedImage] = useState(profileData.pfp)
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = e.target.value;
-        const newImage = images.find(img => img.value === selectedValue) || images[0]; // default first image
+        const newImage = selectedValue || images[0]; // default first image
     
-        setSelectedImage(newImage.src);
+        setSelectedImage(newImage);
         setProfile((prevData) => ({
             ...prevData,
-            img: newImage.src,
+            pfp: newImage,
         }));
     };
 
     const handleInputProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setNewName(value)
+        setProfile((prevData) => ({
+            ...prevData,
+            profilename: value,
+        }));
     };
 
-    const handleSaveProfile = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setProfile(prevData => ({
-            ...prevData,
-            username: newName,
-            img: selectedImage,
-        }));
     
-        setIsEditingProfile(false); 
+        // Prepare the updated profile data
+        const updatedProfile = {
+            profilename: newName,
+            pfp: selectedImage
+        };
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedProfile),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            const updatedData = await response.json();
+            
+            setLoginUser(updatedData)
+            setProfile(prevData => ({
+                ...prevData,
+                profilename: updatedData.profilename,
+                pfp: updatedData.pfp,
+            }));
+            
+            setIsEditingProfile(false);
+
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
     };
 
     {/* Bio */}
-
-    const [bioData, setBio] = useState({
-        gender: 'Male',
-        age: "21-30",
-        address1: '123 Main Street',
-        address2: '',
-        city: 'Huntsville',
-        state: 'AL',
-        zipcode: '12345'
-
-    });
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [newBio, setNewBio] = useState(bioData);
 
@@ -274,15 +314,52 @@ export default function Userprofile() {
         }));
     };
 
-    const handleSaveBio = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSaveBio = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setBio(newBio);
-        setIsEditingBio(false);
+        
+        // Prepare the updated bio data
+        const updatedBio = newBio; // This will contain the updated bio data
+    
+        try {
+            // Make sure you have the user's ID (assuming it's available in `loginUser`)
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                },
+                body: JSON.stringify({updatedBio}), // Sending the updated bio data
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to update bio');
+            }
+    
+            const updatedData = await response.json();
+            
+            setLoginUser(updatedData);
+            setBio(updatedData); 
+            
+            setNewBio(prevData => ({
+                ...prevData,
+                gender: updatedData.gender,
+                age: updatedData.gender,
+                address1: updatedData.address1,
+                address2: updatedData.address2,
+                city: updatedData.city,
+                state: updatedData.state,
+                zipcode: updatedData.zipcode,
+            }));
+    
+            setIsEditingBio(false); // Exit editing mode
+        } catch (error) {
+            console.error("Error updating bio:", error);
+        }
     };
   
     {/* Skills */}
     const [isEditingSkills, setIsEditingSkills] = useState<boolean>(false);
-    const [skills, setSkills] = useState<string[]>([]);
+    // const [skills, setSkills] = useState<string[]>([]);
 
     const handleSkillsSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { options } = e.target;
@@ -296,15 +373,22 @@ export default function Userprofile() {
 
         setSkills(selectedValues);
     };
+
+
     const handleSaveSkills = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSkills([...skills])
+
+        console.log(skills)
         setIsEditingSkills(false); // Exit editing mode
     };
 
+
+
+
     {/* Preferences */}
     const [isEditingPreferences, setIsEditingPreferences] = useState<boolean>(false);
-    const [preferencesData, setPreferencesData] = useState<string>("");
+    // const [preferencesData, setPreferencesData] = useState<string>("");
     const [newPreferences, setNewPreferences] = useState<string>(preferencesData);
 
     const handlePreferencesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -331,15 +415,15 @@ export default function Userprofile() {
                         <form onSubmit={handleSaveProfile}>
                             <div className="flex items-center mb-8">
                                 {isEditingProfile ? (
-                                    <select onChange = {handleImageSelect} value={images.find(img => img.src === selectedImage)?.value || ''}
+                                    <select onChange = {handleImageSelect} value={loginUser ? loginUser.pfp : "bear.png"}
                                     className = "w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
                                         {images.map((img) => (
-                                            <option key={img.value} value={img.value}>{img.label}</option>
+                                            <option key={img} value={img}>{img}</option>
                                         ))}
                                     </select>
                                 ) : (
                                     <div className="overflow-hidden w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
-                                        <img src={profileData.pfp} alt="ProfileImg" className="w-full h-full object-cover"/>
+                                        <img src={`${PFP_PATH}/${loginUser?.pfp}`} alt="ProfileImg" className="w-full h-full object-cover"/>
                                     </div>
                                 )}
 
@@ -351,11 +435,11 @@ export default function Userprofile() {
                                         className="m-2 text-4xl text-white font-bold border-none bg-transparent"
                                         maxLength={50}
                                         required
-                                        value={loginUser ? loginUser.username : "John Doe"}
+                                        value={profileData.profilename}
                                         onChange = {handleInputProfileChange}
                                         />
                                     ) : (
-                                        <p className="m-2 text-4xl text-white font-bold border-black bg-transparent">{loginUser ? loginUser.username : "John Doe"}</p>
+                                        <p className="m-2 text-4xl text-white font-bold border-black bg-transparent">{loginUser ? loginUser.profilename : ""}</p>
                                     )}
                                     </div>
                                     {isEditingProfile ? (
@@ -367,7 +451,7 @@ export default function Userprofile() {
                                     ) : (
                                         <button type="button" className="m-2 bg-slate-300 text-black py-2 px-4 rounded"
                                         onClick={() => {
-                                            setNewName(profileData.username)
+                                            setNewName(profileData.profilename)
                                             setIsEditingProfile(true)}}>Edit</button>
                                     )}
                                 </div>
