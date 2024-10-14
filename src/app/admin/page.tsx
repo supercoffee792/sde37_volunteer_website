@@ -226,10 +226,14 @@ export default function Adminpage() {
         }
     };
 
+    const adminLogout = async() => {
+
+    };
+
     return (
 
       <div className="bg-slate-800 min-h-screen overflow-x-hidden">
-        <Usernavbar/>
+        <Usernavbar onLogout={adminLogout}/>
         <div className="flex h-[90vh] border border-gray-700 rounded-md m-10">
             <div className="w-2/3 border-r border-gray-700 text-white p-10">
                 <h2 className="text-3xl font-bold text-white mb-5">Create Event</h2>
