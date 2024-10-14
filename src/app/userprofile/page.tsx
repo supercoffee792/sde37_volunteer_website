@@ -28,28 +28,28 @@ const images = [ 'bear.png', 'bird.png', 'chameleon.png', 'frog.png', 'raccoon.p
 // ];
 
 const availableSkills = [
-    "Problem solving",
-    "Good with pets",
-    "Good with kids",
-    "Programming",
-    "Leadership",
-    "Writing",
-    "CPR certified",
-    "Carpentry",
-    "Cooking",
-    "Multilingual",
-    "Creative arts",
+    'Problem solving',
+    'Good with pets',
+    'Good with kids',
+    'Programming',
+    'Leadership',
+    'Writing',
+    'CPR certified',
+    'Carpentry',
+    'Cooking',
+    'Multilingual',
+    'Creative arts',
 ];
 
 const ageRanges = [
-    "Under 15",
-    "15-17",
-    "18-20",
-    "21-30",
-    "31-40",
-    "41-50",
-    "51-60",
-    "61+"
+    'Under 15',
+    '15-17',
+    '18-20',
+    '21-30',
+    '31-40',
+    '41-50',
+    '51-60',
+    '61+'
 ]
 
 interface VolunteerData { // data types expected when creating event object
@@ -174,13 +174,13 @@ export default function Userprofile() {
     // };
 
     const [profileData, setProfile] = useState({
-        profilename: loginUser ? loginUser.profilename : "John Doe",
+        profilename: loginUser ? loginUser.profilename : "Name",
         pfp: loginUser ? loginUser.pfp : "bear.png"
     });
     const [bioData, setBio] = useState({
         gender: loginUser ? loginUser.gender : "Male",
         age: loginUser ? loginUser.age : "21-30",
-        address1: loginUser ? loginUser.address1 : "123 Main Streeet",
+        address1: loginUser ? loginUser.address1 : "123 Main",
         address2: loginUser ? loginUser.address2 : "",
         city: loginUser ? loginUser.city : "Huntsville",
         state: loginUser ? loginUser.state : 'AL',
@@ -257,6 +257,7 @@ export default function Userprofile() {
 
     const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log("old: ", loginUser)
     
         // Prepare the updated profile data
         const updatedProfile = {
@@ -279,7 +280,10 @@ export default function Userprofile() {
 
             const updatedData = await response.json();
             
-            setLoginUser(updatedData)
+            setLoginUser(prevUser => ({
+                ...prevUser,
+                ...updatedData
+            }));
             setProfile(prevData => ({
                 ...prevData,
                 profilename: updatedData.profilename,
@@ -287,6 +291,7 @@ export default function Userprofile() {
             }));
             
             setIsEditingProfile(false);
+            console.log("new: ", loginUser)
 
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -316,34 +321,36 @@ export default function Userprofile() {
 
     const handleSaveBio = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log("old: ", loginUser)
         
         // Prepare the updated bio data
         const updatedBio = newBio; // This will contain the updated bio data
+        console.log("updatedBio: ", updatedBio)
     
         try {
             // Make sure you have the user's ID (assuming it's available in `loginUser`)
-            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 },
-                body: JSON.stringify({updatedBio}), // Sending the updated bio data
+                body: JSON.stringify(updatedBio), // Sending the updated bio data
             });
     
             if (!response.ok) {
-                throw new Error('Failed to update bio');
+                const errorText = await response.text();
+                throw new Error(`Failed to update bio: ${errorText}`);
             }
     
             const updatedData = await response.json();
+            console.log("updated data: ", updatedData);
             
             setLoginUser(updatedData);
-            setBio(updatedData); 
             
-            setNewBio(prevData => ({
+            setBio(prevData => ({
                 ...prevData,
                 gender: updatedData.gender,
-                age: updatedData.gender,
+                age: updatedData.age,
                 address1: updatedData.address1,
                 address2: updatedData.address2,
                 city: updatedData.city,
@@ -352,6 +359,9 @@ export default function Userprofile() {
             }));
     
             setIsEditingBio(false); // Exit editing mode
+
+            console.log("new: ", loginUser);
+
         } catch (error) {
             console.error("Error updating bio:", error);
         }
@@ -415,7 +425,7 @@ export default function Userprofile() {
                         <form onSubmit={handleSaveProfile}>
                             <div className="flex items-center mb-8">
                                 {isEditingProfile ? (
-                                    <select onChange = {handleImageSelect} value={loginUser ? loginUser.pfp : "bear.png"}
+                                    <select onChange = {handleImageSelect} value={profileData.pfp}
                                     className = "w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
                                         {images.map((img) => (
                                             <option key={img} value={img}>{img}</option>
@@ -472,10 +482,10 @@ export default function Userprofile() {
                                         <select name="gender" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleSelectBioChange} value={newBio.gender} required>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
-                                            <option value="Other">Non-Binary/Other</option>
+                                            <option value="Non-Binary/Other">Non-Binary/Other</option>
                                         </select>
                                         ):(
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{bioData.gender}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{loginUser ? loginUser.gender : ""}</p>
                                         )}
                                     </div>
 
@@ -489,7 +499,7 @@ export default function Userprofile() {
                                                 ))}
                                             </select>
                                         ):(
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{bioData.age}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{loginUser ? loginUser.age : ""}</p>
                                         )}
                                     </div>
                                     
@@ -513,7 +523,7 @@ export default function Userprofile() {
                                             {isEditingBio ? (
                                                 <input type="text" name="address1" value={newBio.address1} onChange={handleInputBioChange} className="w-full p-2 border border-gray-300 rounded bg-gray-100" maxLength={100} required/>
                                             ) : (
-                                                <p className="h-10 w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-hidden">{bioData.address1}</p>
+                                                <p className="h-10 w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-hidden">{loginUser ? loginUser.address1 : ""}</p>
                                             )}
                                     </div>
                                     <div className="col-span-1 overflow-x-hidden">
@@ -521,7 +531,7 @@ export default function Userprofile() {
                                         {isEditingBio ? (
                                             <input type="text" name="address2" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.address2} onChange={handleInputBioChange} maxLength={100} />
                                         ) : (
-                                            <p className="w-full min-h-10 p-2 border border-gray-300 rounded bg-gray-100">{bioData.address2}</p>
+                                            <p className="w-full min-h-10 p-2 border border-gray-300 rounded bg-gray-100">{loginUser ? loginUser.address2 : ""}</p>
                                         )}
                                     </div>
                                     <div className="col-span-1">
@@ -529,7 +539,7 @@ export default function Userprofile() {
                                         {isEditingBio ? (
                                             <input type="text" name="city" className="w-full p-2 border border-gray-300 rounded bg-gray-100" maxLength={100} value={newBio.city} onChange={handleInputBioChange} required/>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.city}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{loginUser ? loginUser.city : ""}</p>
                                         )}
                                     </div>
                                     <div className="col-span-1">
@@ -541,15 +551,15 @@ export default function Userprofile() {
                                                 ))}
                                             </select>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.state}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{loginUser ? loginUser.state : ""}</p>
                                         )}
                                     </div>
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2 overflow-x-hidden">Zip</label>
                                         {isEditingBio ? (
-                                            <input type="text" name="zip" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.zipcode}onChange={handleInputBioChange} maxLength={9} minLength={5} inputMode={"numeric"} pattern={"[0-9]*"} required/>
+                                            <input type="text" name="zipcode" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.zipcode}onChange={handleInputBioChange} maxLength={9} minLength={5} inputMode={"numeric"} pattern={"[0-9]*"} required/>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.zipcode}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{loginUser ? loginUser.zipcode : ""}</p>
                                         )}
                                     </div>
                                 </div>

@@ -6,7 +6,7 @@ import datetime
 
 class Volunteer(AbstractUser):
     VOLUNTEER_GENDER = {
-        ('Male', 'male'), ('Female', 'female'), ('Non-binary/Other', 'non_binary_other')
+        ('Male', 'Male'), ('Female', 'Female'), ('Non-Binary/Other', 'Non-Binary/Other')
     }
     STATE = {
         ('AL', 'AL'), ('AK', 'AK'), ('AZ', 'AZ'), ('AR', 'AR'), ('CA', 'CA'), 
@@ -21,14 +21,14 @@ class Volunteer(AbstractUser):
         ('VA', 'VA'), ('WA', 'WA'), ('WV', 'WV'), ('WI', 'WI'), ('WY', 'WY')
     }
     AGE = {
-        ("Under 15", 'under_15'),
-       ("15-17", '15-17'),
-        ("18-20", '18-20'),
-        ("21-30", '21-30'),
-        ("31-40", '31-40'),
-        ("41-50", '41-50'),
-        ("51-60", '51-60'),
-        ("61+", '61+')
+        ('Under 15', 'Under 15'),
+       ('15-17', '15-17'),
+        ('18-20', '18-20'),
+        ('21-30', '21-30'),
+        ('31-40', '31-40'),
+        ('41-50', '41-50'),
+        ('51-60', '51-60'),
+        ('61+', '61+')
     }
     PFP = [
         ('bear.png', 'Bear'),
@@ -44,7 +44,7 @@ class Volunteer(AbstractUser):
     gender = models.CharField(max_length=16, choices=VOLUNTEER_GENDER, default="Male")
     age = models.CharField(max_length=8, choices=AGE, default = "21-30")
     address1 = models.CharField(max_length=100, default="123 Main Street")
-    address2 = models.CharField(max_length=100, null=True)
+    address2 = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(max_length=2, choices=STATE, default = "AL")
     city = models.CharField(max_length=100, default="Huntsville")
     zipcode = models.CharField(max_length=9, default = "12345")
