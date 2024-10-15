@@ -18,38 +18,38 @@ const daysOfWeek = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
 ];
 
-const images = [
-{ label: 'bear', value: 'bear', src: bearImage.src },
-{ label: 'bird', value: 'bird', src: birdImage.src },
-{ label: 'chameleon', value: 'chameleon', src: chameleonImage.src },
-{ label: 'frog', value: 'frog', src: frogImage.src },
-{ label: 'raccoon', value: 'raccoon', src: raccoonImage.src },
-{ label: 'turtle', value: 'turtle', src: turtleImage.src }
-];
+const images = [ 'bear.png', 'bird.png', 'chameleon.png', 'frog.png', 'raccoon.png', 'turtle.png']
+// { label: 'bear', value: 'bear.png', src: bearImage.src },
+// { label: 'bird', value: 'bird.png', src: birdImage.src },
+// { label: 'chameleon', value: 'chameleon.png', src: chameleonImage.src },
+// { label: 'frog', value: 'frog.png', src: frogImage.src },
+// { label: 'raccoon', value: 'raccoon.png', src: raccoonImage.src },
+// { label: 'turtle', value: 'turtle.png', src: turtleImage.src }
+// ];
 
-const availableSkills = [
-    "Problem solving",
-    "Good with pets",
-    "Good with kids",
-    "Programming",
-    "Leadership",
-    "Writing",
-    "CPR certified",
-    "Carpentry",
-    "Cooking",
-    "Multilingual",
-    "Creative arts",
-];
+// const availableSkills = [
+//     'Problem solving',
+//     'Good with pets',
+//     'Good with kids',
+//     'Programming',
+//     'Leadership',
+//     'Writing',
+//     'CPR certified',
+//     'Carpentry',
+//     'Cooking',
+//     'Multilingual',
+//     'Creative arts',
+// ];
 
 const ageRanges = [
-    "Under 15",
-    "15-17",
-    "18-20",
-    "21-30",
-    "31-40",
-    "41-50",
-    "51-60",
-    "61+"
+    'Under 15',
+    '15-17',
+    '18-20',
+    '21-30',
+    '31-40',
+    '41-50',
+    '51-60',
+    '61+'
 ]
 
 interface VolunteerData { // data types expected when creating event object
@@ -75,6 +75,7 @@ interface VolunteerData { // data types expected when creating event object
     state: string;
     username: string;
     zipcode: string;
+    availability: Record<string, { startTime: string | null; endTime: string | null }>;
 };
 
 const initialState = {
@@ -94,7 +95,8 @@ const initialState = {
       startTime: '',
       endTime: '',
     },
-  };
+};
+
 
 export default function Userprofile() {   
     // login stuff
@@ -153,107 +155,109 @@ export default function Userprofile() {
             console.log(err);
         }
     };
-    
-    const [volunteers, setVolunteers] = useState<VolunteerData[]>([]); 
 
-    useEffect(() => {
-        fetchVolunteers();
-    }, []);
 
-    const fetchVolunteers = async() => {
-        try {
-            const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
-            const data = await response.json();
-            setVolunteers(data);
-        } 
-        catch (err) {
-            console.log(err);
-        }
-    };
+
+    //Initializations
+    const [profileData, setProfile] = useState({
+        profilename: loginUser ? loginUser.profilename : "Name",
+        pfp: loginUser ? loginUser.pfp : "bear.png"
+    });
+    const [bioData, setBio] = useState({
+        gender: loginUser ? loginUser.gender : "Male",
+        age: loginUser ? loginUser.age : "21-30",
+        address1: loginUser ? loginUser.address1 : "123 Main",
+        address2: loginUser ? loginUser.address2 : "",
+        city: loginUser ? loginUser.city : "Huntsville",
+        state: loginUser ? loginUser.state : 'AL',
+        zipcode: loginUser ? loginUser.zipcode : "12345"
+    });
+    const [skills, setSkills] = useState<string[]>(
+        loginUser && typeof loginUser.skills === 'string' ? loginUser.skills.split(',') : []
+    );
+    const [preferencesData, setPreferencesData] = useState<string>("");
     
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const [startTime, setStartTime] = useState<string | null>(null);
     const [endTime, setEndTime] = useState<string | null>(null);
     const [availability, setAvailability] = useState<Record<string, { startTime: string | null; endTime: string | null }>>({});
-  
-    const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const day = e.target.value;
-      setSelectedDay(day === "" ? null : day);
-      setStartTime(null);
-      setEndTime(null);
-    };
-  
-    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setStartTime(e.target.value || null);
-    };
-  
-    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEndTime(e.target.value || null);
-    };
-  
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (selectedDay && startTime && endTime) {
-        setAvailability(prev => ({
-          ...prev,
-          [selectedDay]: { startTime, endTime }
-        }));
-        // Reset the form
-        setSelectedDay(null);
-        setStartTime(null);
-        setEndTime(null);
-      }
-    };
+    useEffect(() => {
+        if (loginUser) {
+            setAvailability(loginUser.availability || {});
+        }
+    }, [loginUser]);
 
 
     {/* Picture and Name */}
-    const [profileData, setProfile] = useState({
-        username: 'John Doe',
-        pfp: bearImage.src
-    });
     const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
-    const [newName, setNewName] = useState(profileData.username);
+    const [newName, setNewName] = useState(profileData.profilename);
     const [selectedImage, setSelectedImage] = useState(profileData.pfp)
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = e.target.value;
-        const newImage = images.find(img => img.value === selectedValue) || images[0]; // default first image
+        const newImage = selectedValue || images[0]; // default first image
     
-        setSelectedImage(newImage.src);
+        setSelectedImage(newImage);
         setProfile((prevData) => ({
             ...prevData,
-            img: newImage.src,
+            pfp: newImage,
         }));
     };
 
     const handleInputProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setNewName(value)
+        setProfile((prevData) => ({
+            ...prevData,
+            profilename: value,
+        }));
     };
 
-    const handleSaveProfile = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setProfile(prevData => ({
-            ...prevData,
-            username: newName,
-            img: selectedImage,
-        }));
+        console.log("old: ", loginUser)
     
-        setIsEditingProfile(false); 
+        // Prepare the updated profile data
+        const updatedProfile = {
+            profilename: newName,
+            pfp: selectedImage
+        };
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedProfile),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            const updatedData = await response.json();
+            
+            setLoginUser(prevUser => ({
+                ...prevUser,
+                ...updatedData
+            }));
+            setProfile(prevData => ({
+                ...prevData,
+                profilename: updatedData.profilename,
+                pfp: updatedData.pfp,
+            }));
+            
+            setIsEditingProfile(false);
+            console.log("new: ", loginUser)
+
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
     };
 
     {/* Bio */}
-
-    const [bioData, setBio] = useState({
-        gender: 'Male',
-        age: "21-30",
-        address1: '123 Main Street',
-        address2: '',
-        city: 'Huntsville',
-        state: 'AL',
-        zipcode: '12345'
-
-    });
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [newBio, setNewBio] = useState(bioData);
 
@@ -274,48 +278,207 @@ export default function Userprofile() {
         }));
     };
 
-    const handleSaveBio = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSaveBio = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setBio(newBio);
-        setIsEditingBio(false);
+        console.log("old: ", loginUser)
+        
+        // Prepare the updated bio data
+        const updatedBio = newBio; // This will contain the updated bio data
+        console.log("updatedBio: ", updatedBio)
+    
+        try {
+            // Make sure you have the user's ID (assuming it's available in `loginUser`)
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedBio), // Sending the updated bio data
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update bio: ${errorText}`);
+            }
+    
+            const updatedData = await response.json();
+            console.log("updated data: ", updatedData);
+            
+            setLoginUser(updatedData);
+            
+            setBio(prevData => ({
+                ...prevData,
+                gender: updatedData.gender,
+                age: updatedData.age,
+                address1: updatedData.address1,
+                address2: updatedData.address2,
+                city: updatedData.city,
+                state: updatedData.state,
+                zipcode: updatedData.zipcode,
+            }));
+    
+            setIsEditingBio(false); // Exit editing mode
+
+            console.log("new: ", loginUser);
+
+        } catch (error) {
+            console.error("Error updating bio:", error);
+        }
     };
+
   
     {/* Skills */}
     const [isEditingSkills, setIsEditingSkills] = useState<boolean>(false);
-    const [skills, setSkills] = useState<string[]>([]);
 
     const handleSkillsSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { options } = e.target;
-        const selectedValues: string[] = [];
 
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                selectedValues.push(options[i].value);
-            }
-        }
+        const selectedSkills = Array.from(e.target.selectedOptions, option => option.value);
 
-        setSkills(selectedValues);
+        setSkills(selectedSkills);
     };
-    const handleSaveSkills = (e: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSaveSkills = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setSkills([...skills])
-        setIsEditingSkills(false); // Exit editing mode
+    
+        // Prepare the updated skills data
+        const updatedSkills = {
+            skills: skills.join(',') // Assuming the API expects a comma-separated string
+        };
+    
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedSkills),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to update skills');
+            }
+    
+            const updatedData = await response.json();
+            
+            setLoginUser(updatedData);
+    
+            setSkills(updatedData.skills.split(',')); //split back into an array
+            
+            setIsEditingSkills(false);
+
+    
+        } catch (error) {
+            console.error("Error updating skills:", error);
+        }
     };
+
+
 
     {/* Preferences */}
     const [isEditingPreferences, setIsEditingPreferences] = useState<boolean>(false);
-    const [preferencesData, setPreferencesData] = useState<string>("");
     const [newPreferences, setNewPreferences] = useState<string>(preferencesData);
 
     const handlePreferencesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewPreferences(e.target.value); // Update newPreferences with input value
     };
-    const handleSavePreferences = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent form submission default behavior
-        setPreferencesData(newPreferences); // Save the new preferences
-        setIsEditingPreferences(false); // Exit editing mode
-    };
+
+    const handleSavePreferences = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
     
+        const updatedPreferences = { preferences: newPreferences };
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedPreferences),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update preferences: ${errorText}`);
+            }
+
+            const updatedData = await response.json();
+            
+            setLoginUser(updatedData);
+
+            setPreferencesData(updatedData);
+
+            setIsEditingPreferences(false);
+
+        } catch (error) {
+            console.error("Error updating preferences:", error);
+        }
+    };
+
+    {/* Availability */}
+    const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const day = e.target.value;
+        setSelectedDay(day === "" ? null : day);
+        setStartTime(null);
+        setEndTime(null);
+    };
+
+    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setStartTime(e.target.value || null);
+    };
+
+    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEndTime(e.target.value || null);
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (selectedDay && startTime && endTime) {
+
+            const updatedAvailability = {
+                ...availability,
+                [selectedDay]: { startTime, endTime },
+            };
+
+            console.log(updatedAvailability);
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                    method: 'PATCH', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({availability: updatedAvailability }),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to update availability: ${errorText}`);
+                }
+                
+                const updatedData = await response.json();
+
+                console.log(updatedData.availability)
+                
+                setLoginUser(updatedData.availability);
+
+                setAvailability(updatedData.availability);
+
+                // setAvailability(prev => ({
+                //     ...prev,
+                //     [selectedDay]: { startTime, endTime }
+                //     }));
+
+                setSelectedDay(null);
+                setStartTime(null);
+                setEndTime(null);
+
+            } catch (error) {
+                console.error("Error updating availability:", error);
+            }
+        }
+    };
+
+    // console.log(availability)
 
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
@@ -331,15 +494,15 @@ export default function Userprofile() {
                         <form onSubmit={handleSaveProfile}>
                             <div className="flex items-center mb-8">
                                 {isEditingProfile ? (
-                                    <select onChange = {handleImageSelect} value={images.find(img => img.src === selectedImage)?.value || ''}
+                                    <select onChange = {handleImageSelect} value={profileData.pfp}
                                     className = "w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
                                         {images.map((img) => (
-                                            <option key={img.value} value={img.value}>{img.label}</option>
+                                            <option key={img} value={img}>{img}</option>
                                         ))}
                                     </select>
                                 ) : (
                                     <div className="overflow-hidden w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
-                                        <img src={profileData.pfp} alt="ProfileImg" className="w-full h-full object-cover"/>
+                                        <img src={`/images/${loginUser?.pfp}`} alt="ProfileImg" className="w-full h-full object-cover"/>
                                     </div>
                                 )}
 
@@ -351,11 +514,11 @@ export default function Userprofile() {
                                         className="m-2 text-4xl text-white font-bold border-none bg-transparent"
                                         maxLength={50}
                                         required
-                                        value={loginUser ? loginUser.username : "John Doe"}
+                                        value={profileData.profilename}
                                         onChange = {handleInputProfileChange}
                                         />
                                     ) : (
-                                        <p className="m-2 text-4xl text-white font-bold border-black bg-transparent">{loginUser ? loginUser.username : "John Doe"}</p>
+                                        <p className="m-2 text-4xl text-white font-bold border-black bg-transparent">{loginUser ? loginUser.profilename : ""}</p>
                                     )}
                                     </div>
                                     {isEditingProfile ? (
@@ -367,7 +530,7 @@ export default function Userprofile() {
                                     ) : (
                                         <button type="button" className="m-2 bg-slate-300 text-black py-2 px-4 rounded"
                                         onClick={() => {
-                                            setNewName(profileData.username)
+                                            setNewName(profileData.profilename)
                                             setIsEditingProfile(true)}}>Edit</button>
                                     )}
                                 </div>
@@ -388,10 +551,10 @@ export default function Userprofile() {
                                         <select name="gender" className="w-full p-2 border border-gray-300 rounded bg-gray-100" onChange={handleSelectBioChange} value={newBio.gender} required>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
-                                            <option value="Other">Non-Binary/Other</option>
+                                            <option value="Non-Binary/Other">Non-Binary/Other</option>
                                         </select>
                                         ):(
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{bioData.gender}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{loginUser ? loginUser.gender : ""}</p>
                                         )}
                                     </div>
 
@@ -405,7 +568,7 @@ export default function Userprofile() {
                                                 ))}
                                             </select>
                                         ):(
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{bioData.age}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100">{loginUser ? loginUser.age : ""}</p>
                                         )}
                                     </div>
                                     
@@ -429,7 +592,7 @@ export default function Userprofile() {
                                             {isEditingBio ? (
                                                 <input type="text" name="address1" value={newBio.address1} onChange={handleInputBioChange} className="w-full p-2 border border-gray-300 rounded bg-gray-100" maxLength={100} required/>
                                             ) : (
-                                                <p className="h-10 w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-hidden">{bioData.address1}</p>
+                                                <p className="h-10 w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-hidden">{loginUser ? loginUser.address1 : ""}</p>
                                             )}
                                     </div>
                                     <div className="col-span-1 overflow-x-hidden">
@@ -437,7 +600,7 @@ export default function Userprofile() {
                                         {isEditingBio ? (
                                             <input type="text" name="address2" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.address2} onChange={handleInputBioChange} maxLength={100} />
                                         ) : (
-                                            <p className="w-full min-h-10 p-2 border border-gray-300 rounded bg-gray-100">{bioData.address2}</p>
+                                            <p className="w-full min-h-10 p-2 border border-gray-300 rounded bg-gray-100">{loginUser ? loginUser.address2 : ""}</p>
                                         )}
                                     </div>
                                     <div className="col-span-1">
@@ -445,7 +608,7 @@ export default function Userprofile() {
                                         {isEditingBio ? (
                                             <input type="text" name="city" className="w-full p-2 border border-gray-300 rounded bg-gray-100" maxLength={100} value={newBio.city} onChange={handleInputBioChange} required/>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.city}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{loginUser ? loginUser.city : ""}</p>
                                         )}
                                     </div>
                                     <div className="col-span-1">
@@ -457,15 +620,15 @@ export default function Userprofile() {
                                                 ))}
                                             </select>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.state}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{loginUser ? loginUser.state : ""}</p>
                                         )}
                                     </div>
                                     <div className="col-span-1">
                                         <label className="block text-gray-700 text-sm font-bold mb-2 overflow-x-hidden">Zip</label>
                                         {isEditingBio ? (
-                                            <input type="text" name="zip" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.zipcode}onChange={handleInputBioChange} maxLength={9} minLength={5} inputMode={"numeric"} pattern={"[0-9]*"} required/>
+                                            <input type="text" name="zipcode" className="w-full p-2 border border-gray-300 rounded bg-gray-100" value={newBio.zipcode}onChange={handleInputBioChange} maxLength={9} minLength={5} inputMode={"numeric"} pattern={"[0-9]*"} required/>
                                         ) : (
-                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{bioData.zipcode}</p>
+                                            <p className="w-full p-2 border border-gray-300 rounded bg-gray-100 overflow-x-hidden">{loginUser ? loginUser.zipcode : ""}</p>
                                         )}
                                     </div>
                                 </div>
@@ -521,12 +684,18 @@ export default function Userprofile() {
                                 <form className = 'w-full' onSubmit={handleSaveSkills}>
                                     {isEditingSkills ? (
                                         <>
-                                            <select multiple className="w-full  text-black rounded-md p-1" value={skills} onChange={handleSkillsSelectChange}>
-                                                {availableSkills.map((skill) => (
-                                                    <option key={skill} value={skill}>
-                                                        {skill}
-                                                    </option>
-                                                ))}
+                                            <select multiple className="w-full  text-black rounded-md p-1" defaultValue={skills} onChange={handleSkillsSelectChange}>
+                                                <option value="Problem solving">Problem solving</option>
+                                                <option value="Good with pets">Good with pets</option>
+                                                <option value="Good with kids">Good with kids</option>
+                                                <option value="Programming">Programming</option>
+                                                <option value="Leadership">Leadership</option>
+                                                <option value="Writing">Writing</option>
+                                                <option value="CPR certified">CPR certified</option>
+                                                <option value="Carpentry">Carpentry</option>
+                                                <option value="Cooking">Cooking</option>
+                                                <option value="Multilingual">Multilingual</option>
+                                                <option value="Creative arts">Creative arts</option>
                                             </select>
                                             <button type="submit" className="w-full bg-slate-300 text-black py-2 px-4 rounded">Save Skills</button>
                                         </>
@@ -535,9 +704,9 @@ export default function Userprofile() {
                                             <button type="button" className="w-full bg-slate-300 text-black py-2 px-4 rounded" 
                                             onClick={() => setIsEditingSkills(true)}>Edit</button>
                                             <div className="m-4 flex inline-flex flex-wrap gap-2 ">
-                                                {skills.map((skill) => (
-                                                    <p key={skill} className={"py-2 px-4 rounded-full bg-slate-600 text-slate-300"}>
-                                                        {skill}
+                                                {loginUser?.skills?.split(',').map((skill) => (
+                                                    <p key={skill.trim()} className="py-2 px-4 rounded-full bg-slate-600 text-slate-300">
+                                                        {skill.trim()} {/* Trim whitespace around the skill */}
                                                     </p>
                                                 ))}
                                             </div>
@@ -568,7 +737,7 @@ export default function Userprofile() {
                                     </div>
                                 ) : (
                                     <div>
-                                        <p className="p-2 m-2 w-full text-black border border-gray bg-transparent">{preferencesData}</p>
+                                        <p className="p-2 m-2 w-full text-black border border-gray bg-transparent">{loginUser ? loginUser.preferences : ""}</p>
                                         <button type="button" className="p-2 m-2 w-full bg-slate-300 text-black py-2 px-4 rounded" 
                                         onClick={() => {
                                             setIsEditingPreferences(true);
@@ -668,12 +837,16 @@ export default function Userprofile() {
 
               <h3 className="mt-6 text-lg font-semibold">Current Availability:</h3>
               <ul>
-                {Object.entries(availability).map(([day, times]) => (
-                  <li key={day} className="mt-1 text-white">
-                    {day}: {times.startTime} - {times.endTime}
-                  </li>
-                ))}
-              </ul>
+                {loginUser && loginUser.availability ? ( // Check if loginUser and availability exist
+                    Object.entries(loginUser.availability).map(([day, times]) => (
+                        <li key={day} className="mt-1 text-white">
+                            {day}: {times.startTime} - {times.endTime}
+                        </li>
+                    ))
+                ) : (
+                    <li className="mt-1 text-white">No availability set.</li> // Fallback if no availability
+                )}
+            </ul>
             </div>
           </div>
 
