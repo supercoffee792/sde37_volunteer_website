@@ -80,24 +80,30 @@ def create_volunteer(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(['PUT', 'DELETE'])
+@api_view(['PUT', 'DELETE', 'PATCH'])
 def manage_volunteer(request, pk):
     try:
         volunteer = Volunteer.objects.get(pk=pk)
     except Volunteer.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
     if request.method == 'DELETE':
         volunteer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
     elif request.method == 'PUT':
-        volunteer_data = request.data
-        serializer = VolunteerSerializer(data=volunteer_data)
+        serializer = VolunteerSerializer(volunteer, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        serializer = VolunteerSerializer(volunteer, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 # Event view operations
 @api_view(['GET'])
