@@ -232,7 +232,7 @@ export default function Userprofile() {
         };
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser ? loginUser.id : 0}`, {
                 method: 'PATCH', 
                 headers: {
                     'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ export default function Userprofile() {
     
         try {
             // Make sure you have the user's ID (assuming it's available in `loginUser`)
-            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser ? loginUser.id : 0}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -353,7 +353,7 @@ export default function Userprofile() {
         };
     
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser ? loginUser.id : 0}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -395,7 +395,7 @@ export default function Userprofile() {
         const updatedPreferences = { preferences: newPreferences };
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser ? loginUser.id : 0}`, {
                 method: 'PATCH', 
                 headers: {
                     'Content-Type': 'application/json',
@@ -449,7 +449,7 @@ export default function Userprofile() {
             console.log(updatedAvailability);
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser ? loginUser.id : 0}`, {
                     method: 'PATCH', 
                     headers: {
                         'Content-Type': 'application/json',
