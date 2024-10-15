@@ -51,6 +51,7 @@ class Volunteer(AbstractUser):
 
     # User credentials
     username = models.CharField(max_length=100, unique=True)
+    # email = models.EmailField()
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
     
@@ -83,8 +84,6 @@ class Volunteer(AbstractUser):
 #     message = models.TextField()
 #     date_sent = models.DateTimeField(auto_now_add=True)
     
-
-    
 class Event(models.Model):
     EVENT_SKILLS = {
         ('Not urgent', 'not_urgent'), #front end, variable name
@@ -98,6 +97,7 @@ class Event(models.Model):
     urgency = models.CharField(max_length=20, choices=EVENT_SKILLS, default="Not urgent")
     skills = models.TextField(blank=True)
     description = models.TextField(blank=True)
+    volunteers = models.ManyToManyField(Volunteer, related_name='events', blank=True)
 
     # allows for multiple skill choices from form
     def get_skills_list(self):
