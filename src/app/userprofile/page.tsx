@@ -113,9 +113,16 @@ export default function Userprofile() {
                     },
                 });
 
-                const data = await response.json();
-                setLoginUser(data);
-                setLogin(true);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    setLoginUser(data);
+                    setLogin(true);
+                }
+                else {
+                    setLogin(false);
+                    console.log("error logging in");
+                }
             }
             catch(err) {
                 setLogin(false);
@@ -123,7 +130,7 @@ export default function Userprofile() {
             }
         };
         checkLoginStatus()
-    }, [loginUser, isLogin]);
+    }, []);
 
     const volunteerLogout = async () => {
         try {
@@ -319,6 +326,8 @@ export default function Userprofile() {
 
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
+        { isLogin ? (
+            <>
             <Usernavbar onLogout={volunteerLogout}/>
 
             <div className="flex flex-col">
@@ -679,10 +688,14 @@ export default function Userprofile() {
 
         </div>
     </div>
-
+        </>) : (
+            <div className="flex justify-center items-center text-white h-screen font-bold">
+               <h1>Register or login to access user profile</h1>
+            </div>
+            )}
 </div>
 
 
-);
+    );
 
 }
