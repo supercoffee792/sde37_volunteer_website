@@ -27,19 +27,19 @@ const images = [ 'bear.png', 'bird.png', 'chameleon.png', 'frog.png', 'raccoon.p
 // { label: 'turtle', value: 'turtle.png', src: turtleImage.src }
 // ];
 
-const availableSkills = [
-    'Problem solving',
-    'Good with pets',
-    'Good with kids',
-    'Programming',
-    'Leadership',
-    'Writing',
-    'CPR certified',
-    'Carpentry',
-    'Cooking',
-    'Multilingual',
-    'Creative arts',
-];
+// const availableSkills = [
+//     'Problem solving',
+//     'Good with pets',
+//     'Good with kids',
+//     'Programming',
+//     'Leadership',
+//     'Writing',
+//     'CPR certified',
+//     'Carpentry',
+//     'Cooking',
+//     'Multilingual',
+//     'Creative arts',
+// ];
 
 const ageRanges = [
     'Under 15',
@@ -75,6 +75,7 @@ interface VolunteerData { // data types expected when creating event object
     state: string;
     username: string;
     zipcode: string;
+    availability: Record<string, { startTime: string | null; endTime: string | null }>;
 };
 
 const initialState = {
@@ -94,9 +95,8 @@ const initialState = {
       startTime: '',
       endTime: '',
     },
-  };
+};
 
-const PFP_PATH = "../images"
 
 export default function Userprofile() {   
     // login stuff
@@ -155,24 +155,10 @@ export default function Userprofile() {
             console.log(err);
         }
     };
-    
-    // const [volunteers, setVolunteers] = useState<VolunteerData[]>([]); 
 
-    // useEffect(() => {
-    //     fetchVolunteers();
-    // }, []);
 
-    // const fetchVolunteers = async() => {
-    //     try {
-    //         const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
-    //         const data = await response.json();
-    //         setVolunteers(data);
-    //     } 
-    //     catch (err) {
-    //         console.log(err);
-    //     }
-    // };
 
+    //Initializations
     const [profileData, setProfile] = useState({
         profilename: loginUser ? loginUser.profilename : "Name",
         pfp: loginUser ? loginUser.pfp : "bear.png"
@@ -187,46 +173,19 @@ export default function Userprofile() {
         zipcode: loginUser ? loginUser.zipcode : "12345"
     });
     const [skills, setSkills] = useState<string[]>(
-        loginUser && Array.isArray(loginUser.skills) ? loginUser.skills : []
-      );
+        loginUser && typeof loginUser.skills === 'string' ? loginUser.skills.split(',') : []
+    );
     const [preferencesData, setPreferencesData] = useState<string>("");
-
-
     
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const [startTime, setStartTime] = useState<string | null>(null);
     const [endTime, setEndTime] = useState<string | null>(null);
     const [availability, setAvailability] = useState<Record<string, { startTime: string | null; endTime: string | null }>>({});
-  
-    {/* Availability */}
-    const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const day = e.target.value;
-      setSelectedDay(day === "" ? null : day);
-      setStartTime(null);
-      setEndTime(null);
-    };
-  
-    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setStartTime(e.target.value || null);
-    };
-  
-    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEndTime(e.target.value || null);
-    };
-  
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (selectedDay && startTime && endTime) {
-        setAvailability(prev => ({
-          ...prev,
-          [selectedDay]: { startTime, endTime }
-        }));
-        // Reset the form
-        setSelectedDay(null);
-        setStartTime(null);
-        setEndTime(null);
-      }
-    };
+    useEffect(() => {
+        if (loginUser) {
+            setAvailability(loginUser.availability || {});
+        }
+    }, [loginUser]);
 
 
     {/* Picture and Name */}
@@ -366,50 +325,160 @@ export default function Userprofile() {
             console.error("Error updating bio:", error);
         }
     };
+
   
     {/* Skills */}
     const [isEditingSkills, setIsEditingSkills] = useState<boolean>(false);
-    // const [skills, setSkills] = useState<string[]>([]);
 
     const handleSkillsSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { options } = e.target;
-        const selectedValues: string[] = [];
 
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                selectedValues.push(options[i].value);
-            }
-        }
+        const selectedSkills = Array.from(e.target.selectedOptions, option => option.value);
 
-        setSkills(selectedValues);
+        setSkills(selectedSkills);
     };
 
-
-    const handleSaveSkills = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSaveSkills = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setSkills([...skills])
+    
+        // Prepare the updated skills data
+        const updatedSkills = {
+            skills: skills.join(',') // Assuming the API expects a comma-separated string
+        };
+    
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedSkills),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to update skills');
+            }
+    
+            const updatedData = await response.json();
+            
+            setLoginUser(updatedData);
+    
+            setSkills(updatedData.skills.split(',')); //split back into an array
+            
+            setIsEditingSkills(false);
 
-        console.log(skills)
-        setIsEditingSkills(false); // Exit editing mode
+    
+        } catch (error) {
+            console.error("Error updating skills:", error);
+        }
     };
-
 
 
 
     {/* Preferences */}
     const [isEditingPreferences, setIsEditingPreferences] = useState<boolean>(false);
-    // const [preferencesData, setPreferencesData] = useState<string>("");
     const [newPreferences, setNewPreferences] = useState<string>(preferencesData);
 
     const handlePreferencesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewPreferences(e.target.value); // Update newPreferences with input value
     };
-    const handleSavePreferences = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent form submission default behavior
-        setPreferencesData(newPreferences); // Save the new preferences
-        setIsEditingPreferences(false); // Exit editing mode
-    };
+
+    const handleSavePreferences = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
     
+        const updatedPreferences = { preferences: newPreferences };
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                method: 'PATCH', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedPreferences),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update preferences: ${errorText}`);
+            }
+
+            const updatedData = await response.json();
+            
+            setLoginUser(updatedData);
+
+            setPreferencesData(updatedData);
+
+            setIsEditingPreferences(false);
+
+        } catch (error) {
+            console.error("Error updating preferences:", error);
+        }
+    };
+
+    {/* Availability */}
+    const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const day = e.target.value;
+        setSelectedDay(day === "" ? null : day);
+        setStartTime(null);
+        setEndTime(null);
+    };
+
+    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setStartTime(e.target.value || null);
+    };
+
+    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEndTime(e.target.value || null);
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (selectedDay && startTime && endTime) {
+
+            const updatedAvailability = {
+                ...availability,
+                [selectedDay]: { startTime, endTime },
+            };
+
+            console.log(updatedAvailability);
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}`, {
+                    method: 'PATCH', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({availability: updatedAvailability }),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to update availability: ${errorText}`);
+                }
+                
+                const updatedData = await response.json();
+
+                console.log(updatedData.availability)
+                
+                setLoginUser(updatedData.availability);
+
+                setAvailability(updatedData.availability);
+
+                // setAvailability(prev => ({
+                //     ...prev,
+                //     [selectedDay]: { startTime, endTime }
+                //     }));
+
+                setSelectedDay(null);
+                setStartTime(null);
+                setEndTime(null);
+
+            } catch (error) {
+                console.error("Error updating availability:", error);
+            }
+        }
+    };
+
+    // console.log(availability)
 
     return (
         <div className="bg-slate-800 h-screen overflow-x-hidden">
@@ -433,7 +502,7 @@ export default function Userprofile() {
                                     </select>
                                 ) : (
                                     <div className="overflow-hidden w-24 h-24 rounded-md mr-6 border-2 border-gray-300">
-                                        <img src={`${PFP_PATH}/${loginUser?.pfp}`} alt="ProfileImg" className="w-full h-full object-cover"/>
+                                        <img src={`/images/${loginUser?.pfp}`} alt="ProfileImg" className="w-full h-full object-cover"/>
                                     </div>
                                 )}
 
@@ -615,12 +684,18 @@ export default function Userprofile() {
                                 <form className = 'w-full' onSubmit={handleSaveSkills}>
                                     {isEditingSkills ? (
                                         <>
-                                            <select multiple className="w-full  text-black rounded-md p-1" value={skills} onChange={handleSkillsSelectChange}>
-                                                {availableSkills.map((skill) => (
-                                                    <option key={skill} value={skill}>
-                                                        {skill}
-                                                    </option>
-                                                ))}
+                                            <select multiple className="w-full  text-black rounded-md p-1" defaultValue={skills} onChange={handleSkillsSelectChange}>
+                                                <option value="Problem solving">Problem solving</option>
+                                                <option value="Good with pets">Good with pets</option>
+                                                <option value="Good with kids">Good with kids</option>
+                                                <option value="Programming">Programming</option>
+                                                <option value="Leadership">Leadership</option>
+                                                <option value="Writing">Writing</option>
+                                                <option value="CPR certified">CPR certified</option>
+                                                <option value="Carpentry">Carpentry</option>
+                                                <option value="Cooking">Cooking</option>
+                                                <option value="Multilingual">Multilingual</option>
+                                                <option value="Creative arts">Creative arts</option>
                                             </select>
                                             <button type="submit" className="w-full bg-slate-300 text-black py-2 px-4 rounded">Save Skills</button>
                                         </>
@@ -629,9 +704,9 @@ export default function Userprofile() {
                                             <button type="button" className="w-full bg-slate-300 text-black py-2 px-4 rounded" 
                                             onClick={() => setIsEditingSkills(true)}>Edit</button>
                                             <div className="m-4 flex inline-flex flex-wrap gap-2 ">
-                                                {skills.map((skill) => (
-                                                    <p key={skill} className={"py-2 px-4 rounded-full bg-slate-600 text-slate-300"}>
-                                                        {skill}
+                                                {loginUser?.skills?.split(',').map((skill) => (
+                                                    <p key={skill.trim()} className="py-2 px-4 rounded-full bg-slate-600 text-slate-300">
+                                                        {skill.trim()} {/* Trim whitespace around the skill */}
                                                     </p>
                                                 ))}
                                             </div>
@@ -662,7 +737,7 @@ export default function Userprofile() {
                                     </div>
                                 ) : (
                                     <div>
-                                        <p className="p-2 m-2 w-full text-black border border-gray bg-transparent">{preferencesData}</p>
+                                        <p className="p-2 m-2 w-full text-black border border-gray bg-transparent">{loginUser ? loginUser.preferences : ""}</p>
                                         <button type="button" className="p-2 m-2 w-full bg-slate-300 text-black py-2 px-4 rounded" 
                                         onClick={() => {
                                             setIsEditingPreferences(true);
@@ -762,12 +837,16 @@ export default function Userprofile() {
 
               <h3 className="mt-6 text-lg font-semibold">Current Availability:</h3>
               <ul>
-                {Object.entries(availability).map(([day, times]) => (
-                  <li key={day} className="mt-1 text-white">
-                    {day}: {times.startTime} - {times.endTime}
-                  </li>
-                ))}
-              </ul>
+                {loginUser && loginUser.availability ? ( // Check if loginUser and availability exist
+                    Object.entries(loginUser.availability).map(([day, times]) => (
+                        <li key={day} className="mt-1 text-white">
+                            {day}: {times.startTime} - {times.endTime}
+                        </li>
+                    ))
+                ) : (
+                    <li className="mt-1 text-white">No availability set.</li> // Fallback if no availability
+                )}
+            </ul>
             </div>
           </div>
 
