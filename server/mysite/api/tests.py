@@ -80,6 +80,12 @@ class EventViewTest(TestCase):
         response = self.client.get('/api/events/')
         self.assertEqual(response.status_code, 200)
 
+    def test_num_events(self):
+        num_events = 5
+        for event_id in range(1, num_events + 1):
+            example = Event.objects.get(id=event_id)
+            self.assertEqual(example.id, event_id)
+
 #########################################################################################
 #different users test case
 class UserModelTest(TestCase):
@@ -194,12 +200,6 @@ class UserModelTest(TestCase):
 #         response = self.client.get('/api/volunteers/')
 #         self.assertEqual(response.status_code, 200)
 #         self.assertContains(response, "Volunteer 0")  # Check for one of the volunteer usernames
-    
-    def test_num_events(self):
-        num_events = 5
-        for event_id in range(1, num_events + 1):
-            example = Event.objects.get(id=event_id)
-            self.assertEqual(example.id, event_id)
 
 class EventAPITest(APITestCase):
     def test_post_view(self): # Create event view

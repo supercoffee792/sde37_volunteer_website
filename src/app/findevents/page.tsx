@@ -70,6 +70,35 @@ export default function Findevents() {
     checkLoginStatus();
   }, []);
 
+  const volunteerLogout = async () => {
+      try {
+          const a_token = localStorage.getItem("access_token");
+          const r_token = localStorage.getItem("refresh_token");
+
+          if (r_token && a_token) {
+              const response = await fetch('http://127.0.0.1:8000/api/logout/', {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "Authorization":`Bearer ${a_token}`,
+                  },
+                  body: JSON.stringify({ refresh: r_token }),
+              });
+
+              localStorage.removeItem("access_token");
+              localStorage.removeItem("refresh_token");
+              setLogin(false);
+              setLoginUser(null);
+              console.log("logged out");
+              router.push('/signin');
+          }
+      }
+      catch(err) {
+          console.log("Can't logout");
+          console.log(err);
+      }
+  };
+
 
   useEffect(() => {
       fetchEvents();
@@ -116,7 +145,7 @@ export default function Findevents() {
 
     return (
         <div className="bg-slate-800 min-h-screen overflow-x-hidden">
-          <Usernavbar/>
+          <Usernavbar onLogout={volunteerLogout}/>
             <div className="flex flex-col h-full min-h-screen border border-gray-700 rounded-lg m-10 p-6 bg-slate-800 shadow-lg">
               <h1 className="text-3xl font-bold text-white mb-8">Available Events</h1>
 
