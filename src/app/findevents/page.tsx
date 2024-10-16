@@ -59,6 +59,7 @@ export default function Findevents() {
         });
 
         const data = await response.json();
+        console.log("Logged-in User Data:", data); // Log the user data
         setLoginUser(data);
         setLogin(true);
       }
@@ -71,33 +72,33 @@ export default function Findevents() {
   }, []);
 
   const volunteerLogout = async () => {
-      try {
-          const a_token = localStorage.getItem("access_token");
-          const r_token = localStorage.getItem("refresh_token");
+    try {
+        const a_token = localStorage.getItem("access_token");
+        const r_token = localStorage.getItem("refresh_token");
 
-          if (r_token && a_token) {
-              const response = await fetch('http://127.0.0.1:8000/api/logout/', {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                      "Authorization":`Bearer ${a_token}`,
-                  },
-                  body: JSON.stringify({ refresh: r_token }),
-              });
+        if (r_token && a_token) {
+            const response = await fetch('http://127.0.0.1:8000/api/logout/', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization":`Bearer ${a_token}`,
+                },
+                body: JSON.stringify({ refresh: r_token }),
+            });
 
-              localStorage.removeItem("access_token");
-              localStorage.removeItem("refresh_token");
-              setLogin(false);
-              setLoginUser(null);
-              console.log("logged out");
-              router.push('/signin');
-          }
-      }
-      catch(err) {
-          console.log("Can't logout");
-          console.log(err);
-      }
-  };
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            setLogin(false);
+            setLoginUser(null);
+            console.log("logged out");
+            router.push('/signin');
+        }
+    }
+    catch(err) {
+        console.log("Can't logout");
+        console.log(err);
+    }
+};
 
 
   useEffect(() => {
@@ -120,7 +121,8 @@ export default function Findevents() {
     if (!isLogin) {
       router.push('/signin');
     } else {
-      // Logic for signed-in users to sign up for the event
+      console.log("Event ID:", eventId); // Log the eventId
+
       try {
         const token = localStorage.getItem("access_token");
         const response = await fetch(`http://127.0.0.1:8000/api/events/${eventId}/signup/`, {
@@ -129,8 +131,12 @@ export default function Findevents() {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ volunteerId: loginUser?.id }),
         });
+
+        console.log("Fetch Response Object:", response);
+
+        const data = await response.json();
+        console.log("Parsed Response Data:", data);
 
         if (response.ok) {
           console.log("Successfully signed up for the event");
@@ -164,7 +170,7 @@ export default function Findevents() {
                           <p className="text-slate-300">Skills Needed: {item.skills}</p>
                           <p className="text-slate-300">Urgency: {item.urgency}</p>
                         </div>                   
-                        <button onClick={() => handleSignUp(item.id)} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Sign Up</button>     
+                        <button onClick={() => handleSignUp(item.id)} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Sign Up</button>
                       </div>                      
                     </li>
                   ))}
