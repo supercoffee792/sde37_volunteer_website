@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.exceptions import AuthenticationFailed
@@ -140,3 +140,34 @@ def manage_event(request, pk):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# @api_view(['POST'])
+# def event_signup(request, pk):
+#     permission_classes = [IsAuthenticated]
+#     user = request.user
+#     try:
+#         event = Event.objects.get(pk=pk)
+
+
+#         if not volunteer_id:
+#             return Response({"error": "Volunteer ID is required"}, status=400)
+        
+#         event.volunteers.add(user)
+#         return Response({"message": "Successfully signed up for the event!"})
+    
+#     except Event.DoesNotExist:
+#         return Response({"error": "Event not found"}, status=404)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def event_signup(request, pk):
+    print(f"Authenticated user: {request.user}")
+    try:
+        event = Event.objects.get(pk=pk)
+        event.volunteers.add(request.user)
+
+        return Response({"message": "Successfully signed up for the event!"})
+
+    except Event.DoesNotExist:
+        return Response({"error": "Event not found"}, status=404)
