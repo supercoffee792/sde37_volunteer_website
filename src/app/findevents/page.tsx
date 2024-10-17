@@ -121,15 +121,15 @@ export default function Findevents() {
     if (!isLogin) {
       router.push('/signin');
     } else {
-      console.log("Event ID:", eventId); // Log the eventId
+      console.log("Event ID:", eventId);
 
       try {
-        const token = localStorage.getItem("access_token");
+        const a_token = localStorage.getItem("access_token");
         const response = await fetch(`http://127.0.0.1:8000/api/events/${eventId}/signup/`, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${a_token}`,
           },
         });
 
