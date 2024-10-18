@@ -68,14 +68,6 @@ class Volunteer(AbstractUser):
         self.skills = ','.join(skills)
 
     
-# class EventHistory(models.Model):
-#     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='event_history')
-#     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_history')
-#     is_future_event
-    
-#     #checking if event is an upcoming or past event (true if past event)
-#     def has_happened(self): 
-#         return self.event.date < datetime.date.today() 
     
 class Event(models.Model):
     EVENT_SKILLS = {

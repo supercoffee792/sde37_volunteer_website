@@ -70,6 +70,8 @@ export default function Adminpage() {
     const nameInputRef = useRef<HTMLInputElement>(null);
     const dateInputRef = useRef<HTMLInputElement>(null);
     const locationInputRef = useRef<HTMLInputElement>(null);
+    const urgencyInputRef = useRef<HTMLSelectElement>(null);
+    const skillsInputRef = useRef<HTMLSelectElement>(null);
     const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
     const handleOpen = (pk: number) => {
@@ -91,10 +93,9 @@ export default function Adminpage() {
 
     const handleClose = () => {
       setPopupOpen(false);
-      // setCurrID(null);
     };
 
-    const handleFormChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleFormChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { target } = event;
       
       if (nameInputRef.current) {
@@ -105,6 +106,21 @@ export default function Adminpage() {
       }
       if (locationInputRef.current) {
         setNewLocation(locationInputRef.current!.value);
+      }
+      if (urgencyInputRef.current) {
+        setNewUrgency(urgencyInputRef.current!.value);
+      }
+      if (skillsInputRef.current) {
+        const options = skillsInputRef.current!.selectedOptions;
+        const selectedValues: string[] = [];
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                selectedValues.push(options[i].value);
+            }
+        }
+
+        setNewSkills(selectedValues);
       }
       if (descriptionInputRef.current) {
         setNewDescription(descriptionInputRef.current!.value);
@@ -125,6 +141,15 @@ export default function Adminpage() {
       }
       if (locationInputRef.current) {
         locationInputRef.current.value = itemToEdit.location;
+      }
+      if (urgencyInputRef.current) {
+        urgencyInputRef.current.value = itemToEdit.urgency;
+      }
+      if (skillsInputRef.current) {
+        const tempArr = itemToEdit.skills.split(',');
+        Array.from(skillsInputRef.current.options).forEach(option => {
+          option.selected = tempArr.includes(option.value);
+        });
       }
       if (descriptionInputRef.current) {
         descriptionInputRef.current.value = itemToEdit.description;
@@ -160,19 +185,6 @@ export default function Adminpage() {
 
         setSkills(selectedValues);
     };
-
-    /*const handleNewSkillsSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const { options } = event.target;
-        const selectedValues: string[] = [];
-
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                selectedValues.push(options[i].value);
-            }
-        }
-
-        setNewSkills(selectedValues);
-    };*/
 
     const handleAddEventSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -214,13 +226,13 @@ export default function Adminpage() {
           return;
         }
 
-        const t_skills = original.skills;
+        const new_skills = newSkills.join(',');
         const eventNewData = {
           name: newName,
           date: newDate,
           location: newLocation,
-          urgency: original.urgency,
-          skills: t_skills,
+          urgency: newUrgency,
+          skills: new_skills,
           description: newDescription,
         };
 
@@ -310,7 +322,7 @@ export default function Adminpage() {
       <div className="bg-slate-800 min-h-screen overflow-x-hidden">
         <Usernavbar onLogout={adminLogout}/>
         <div className="flex h-[90vh] border border-gray-700 rounded-md m-10">
-            <div className="w-2/3 border-r border-gray-700 text-white p-10">
+            <div className="w-2/3 border-r border-gray-700 text-white p-10 overflow-auto">
                 <h2 className="text-3xl font-bold text-white mb-5">Create Event</h2>
                 <form onSubmit={handleAddEventSubmit} className="text-white">
                     <div className="mb-4">
@@ -362,11 +374,11 @@ export default function Adminpage() {
             </div>
             <div className="w-1/3 text-3xl text-white p-10 overflow-auto">
                 <p className="font-bold mb-5">Manage events</p>
-                <button className="w-auto mb-4 bg-gray-600 text-white text-sm p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                {/*<button className="w-auto mb-4 bg-gray-600 text-white text-sm p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
                   Filters...
-                </button>
+                </button>*/}
                 <div className="bg-slate-700 p-6 text-sm rounded-lg shadow-lg">
-                  <h2 className="text-1xl font-semibold text-white mb-6">Events</h2>
+                  {/*<h2 className="text-1xl font-semibold text-white mb-6">Events</h2>*/}
 
                   {/* json data mapping */}
                   <ul className="space-y-6">
@@ -393,45 +405,72 @@ export default function Adminpage() {
                       </li>
                     ))}
 
-                    {
-                        popupOpen && 
-                        <div className="fixed inset-0 m-0 flex items-center justify-center bg-black bg-opacity-20 max-w-screen ">
-                          <div className="flex flex-col bg-slate-600 rounded-lg p-8 w-1/2">
-                            <div className="flex justify-between">
-                              <h2 className="text-3xl font-bold text-white mb-5">Update Event</h2>
-                              <button onClick={() => handleClose()} className="text-1xl bg-red-600 px-2 rounded-md">Close</button>
-                            </div>
-
-                            <form onSubmit={handleUpdateEventSubmit} className="text-white">
-                              <div className="mb-4">
-                                  <label htmlFor="event-name" className="">Event Name</label>
-                                  <input type="text" id="event-name" max-length="100" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" 
-                                    onChange={handleFormChange} ref={nameInputRef} required />
-                              </div>
-                              <div className="mb-4">
-                                  <label htmlFor="event-date" className="">Date</label>
-                                  <input type="date" id="event-date" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" placeholder="mm/dd/yy" 
-                                  onChange={handleFormChange} ref={dateInputRef} required />
-                              </div>
-                              <div className="mb-4">
-                                  <label htmlFor="event-location" className="">Location</label>
-                                  <input type="text" id="event-location" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" 
-                                  onChange={handleFormChange} ref={locationInputRef} required />
-                              </div>      
-                              <div className="mb-4">
-                                  <label htmlFor="event-description" className="">Description</label>
-                                  <textarea id="event-description" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2"
-                                  onChange={handleFormChange} ref={descriptionInputRef} required></textarea>
-                              </div>
-                              <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">Update Event</button>
-                            </form>
-                          </div>
-                        </div>
-                      }
+                    
                     
                   </ul>
               </div>
             </div>
+            
+            {/*Event edit popup*/}
+            {
+              popupOpen && 
+              <div className="fixed inset-0 m-0 flex items-center justify-center bg-black bg-opacity-20 max-w-screen max-h-screen">
+                <div className="flex flex-col bg-slate-600 rounded-lg p-8 w-1/2">
+                  <div className="flex justify-between">
+                    <h2 className="text-3xl font-bold text-white mb-5">Update Event</h2>
+                    <button onClick={() => handleClose()} className="text-2xl bg-red-600 hover:bg-red-800 w-10 h-10 pb-1 rounded-md text-white">&times;</button>
+                  </div>
+
+                  <form onSubmit={handleUpdateEventSubmit} className="text-white">
+                    <div className="mb-4">
+                        <label htmlFor="event-name" className="">Event Name</label>
+                        <input type="text" id="event-name" max-length="100" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" 
+                          onChange={handleFormChange} ref={nameInputRef} required />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="event-date" className="">Date</label>
+                        <input type="date" id="event-date" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" placeholder="mm/dd/yy" 
+                        onChange={handleFormChange} ref={dateInputRef} required />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="event-location" className="">Location</label>
+                        <input type="text" id="event-location" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2" 
+                        onChange={handleFormChange} ref={locationInputRef} required />
+                    </div>
+                    <div className="mb-4">
+                      <label htmlFor="event-urgency" className="mr-4">Urgency</label>
+                      <select className="text-black rounded-md p-1" onChange={handleFormChange} ref={urgencyInputRef}>
+                          <option value="Not urgent">Not urgent</option>
+                          <option value="Urgent">Urgent</option>
+                          <option value="Very urgent">Very urgent</option>
+                      </select>
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="event-skills" className="block mb-4 mr-4">Required skills (Hold ctrl on Windows and hold cmd on Mac to multi-select) </label>
+                        <select multiple className="text-black rounded-md p-1" onChange={handleFormChange} ref={skillsInputRef}>
+                            <option value="Problem solving">Problem solving</option>
+                            <option value="Good with pets">Good with pets</option>
+                            <option value="Good with kids">Good with kids</option>
+                            <option value="Programming">Programming</option>
+                            <option value="Leadership">Leadership</option>
+                            <option value="Writing">Writing</option>
+                            <option value="CPR certified">CPR certified</option>
+                            <option value="Carpentry">Carpentry</option>
+                            <option value="Cooking">Cooking</option>
+                            <option value="Multilingual">Multilingual</option>
+                            <option value="Creative arts">Creative arts</option>
+                        </select>
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="event-description" className="">Description</label>
+                        <textarea id="event-description" className="text-black mt-1 block w-full border-gray-300 rounded-md p-2"
+                        onChange={handleFormChange} ref={descriptionInputRef} required></textarea>
+                    </div>
+                    <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">Update Event</button>
+                  </form>
+                </div>
+              </div>
+            }
         </div>
 
         <div className="flex flex-col h-full min-h-screen border border-gray-700 rounded-lg m-10 p-6 bg-slate-800 shadow-lg">

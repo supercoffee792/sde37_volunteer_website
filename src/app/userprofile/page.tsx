@@ -17,27 +17,6 @@ const daysOfWeek = [
 ];
 
 const images = [ 'bear.png', 'bird.png', 'chameleon.png', 'frog.png', 'raccoon.png', 'turtle.png']
-// { label: 'bear', value: 'bear.png', src: bearImage.src },
-// { label: 'bird', value: 'bird.png', src: birdImage.src },
-// { label: 'chameleon', value: 'chameleon.png', src: chameleonImage.src },
-// { label: 'frog', value: 'frog.png', src: frogImage.src },
-// { label: 'raccoon', value: 'raccoon.png', src: raccoonImage.src },
-// { label: 'turtle', value: 'turtle.png', src: turtleImage.src }
-// ];
-
-// const availableSkills = [
-//     'Problem solving',
-//     'Good with pets',
-//     'Good with kids',
-//     'Programming',
-//     'Leadership',
-//     'Writing',
-//     'CPR certified',
-//     'Carpentry',
-//     'Cooking',
-//     'Multilingual',
-//     'Creative arts',
-// ];
 
 const ageRanges = [
     'Under 15',
@@ -49,6 +28,15 @@ const ageRanges = [
     '51-60',
     '61+'
 ]
+
+interface EventData {
+    id: number;
+    name: string;
+    date: string;
+    location: string;
+    urgency: string;
+    description: string;
+}
 
 interface VolunteerData { // data types expected when creating event object
     id: number;
@@ -74,6 +62,7 @@ interface VolunteerData { // data types expected when creating event object
     username: string;
     zipcode: string;
     availability: Record<string, { startTime: string | null; endTime: string | null }>;
+    events: EventData[];
 };
 
 const initialState = {
@@ -758,6 +747,23 @@ export default function Userprofile() {
                         {/* Event History*/}
                         <div className="mb-4 flex-col">
                             <h2 className="text-2xl text-white font-semibold mb-4">Event History</h2>
+                            <div className="bg-white p-6 rounded-lg whitespace-nowrap shadow-md flex overflow-x-auto space-x-4 max-w-full">
+                             {loginUser && loginUser.events.length > 0 ? (
+                            loginUser.events.map((event) => (
+                                <div key={event.id} className="min-w-[250px] bg-gray-100 p-4 rounded-lg overflow-x-hidden">
+                                <h3 className="text-xl font-bold">{event.name}</h3>
+                                <p className="text-sm text-gray-600">Date: {event.date}</p>
+                                <p className="text-sm text-gray-600">Location: {event.location}</p>
+                                <p className="text-sm text-gray-500">Description: {event.description}</p>
+                                </div>
+                            ))
+                            ) : (
+                            <p className="text-gray-500">No events signed up for.</p>
+                            )} 
+                        </div>
+
+
+                            {/* <h2 className="text-2xl text-white font-semibold mb-4">Event History</h2>
                             <div className="bg-white p-6 rounded-lg shadow-md flex overflow-x-auto space-x-4">
                                 <div className="min-w-[250px] bg-gray-100 p-4 rounded-lg">
                                     <h3 className="text-xl font-bold">Event Name</h3>
@@ -795,7 +801,7 @@ export default function Userprofile() {
                                     <p className="text-sm text-gray-600">Location: San Francisco, CA</p>
                                     <p className="text-sm text-gray-500">Description: A discussion on...</p>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                         {/* Availability Section */}
                         <div className="mb-4 flex-col">
