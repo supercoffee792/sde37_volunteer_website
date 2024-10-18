@@ -12,8 +12,6 @@ import frogImage from '../images/frog.png';
 import raccoonImage from '../images/raccoon.png';
 import turtleImage from '../images/turtle.png';
 
-
-
 const daysOfWeek = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
 ];
@@ -106,6 +104,10 @@ export default function Userprofile() {
     const router = useRouter();
 
     useEffect(() => {
+        fetchNotifications();
+      }, [loginUser?.id]);
+
+    useEffect(() => {
         const checkLoginStatus = async () => {
             try {
                 const token = localStorage.getItem("access_token");
@@ -188,6 +190,7 @@ export default function Userprofile() {
     const [startTime, setStartTime] = useState<string | null>(null);
     const [endTime, setEndTime] = useState<string | null>(null);
     const [availability, setAvailability] = useState<Record<string, { startTime: string | null; endTime: string | null }>>({});
+    const [notifications, setNotifications] = useState<string[]>([]);
     useEffect(() => {
         if (loginUser) {
             setAvailability(loginUser.availability || {});
@@ -485,6 +488,18 @@ export default function Userprofile() {
         }
     };
 
+    const fetchNotifications = async () => {
+        if (!loginUser?.id) return;
+        
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/api/volunteers/${loginUser.id}/notifications/`);
+          const data = await response.json();
+          setNotifications(data.notifications || []);
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+        }
+      };
+
     // console.log(availability)
 
     return (
@@ -649,34 +664,16 @@ export default function Userprofile() {
                     <div className="w-1/4 bg-white p-8 rounded-lg shadow-md flex flex-col max-h-96">
                         <h2 className="text-2xl font-semibold overflow-y-hidden pb-6">Notifications</h2>
                         <div className="flex-grow flex-col space-y-4 overflow-y-auto">
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
-                            <div className="p-4 bg-gray-100 rounded-lg ">
-                                <p className="text-gray-700 overflow-x-hidden">New message from Jane Doe.</p>
-                                <span className="text-xs text-gray-500">5 mins ago</span>
-                            </div>
+                            {notifications.length > 0 ? (
+                                notifications.map((notification, index) => (
+                                    <div key={index} className="p-4 bg-gray-100 rounded-lg">
+                                        <p className="text-gray-700 overflow-x-hidden">{notification}</p>
+                                    </div>
+                                ))) : (
+                                <div className="p-4 bg-gray-100 rounded-lg">
+                                    <p className="text-gray-700">No notifications</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

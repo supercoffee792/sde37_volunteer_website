@@ -57,7 +57,7 @@ class Volunteer(AbstractUser):
     
     skills = models.TextField(blank=True)
     preferences = models.TextField(blank=True)
-    notififications = models.TextField(blank=True)
+    notifications = models.TextField(blank=True)
     availability = models.JSONField(default=dict)
     
     # allows for multiple skill choices from form
@@ -76,13 +76,6 @@ class Volunteer(AbstractUser):
 #     #checking if event is an upcoming or past event (true if past event)
 #     def has_happened(self): 
 #         return self.event.date < datetime.date.today() 
-    
-    
-# class Notification(models.Model):
-#     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='notifications')
-#     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='notifications')
-#     message = models.TextField()
-#     date_sent = models.DateTimeField(auto_now_add=True)
     
 class Event(models.Model):
     EVENT_SKILLS = {

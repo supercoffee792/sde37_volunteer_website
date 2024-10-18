@@ -12,6 +12,7 @@ urlpatterns = [
     path("volunteers/", get_volunteers, name="get_volunteers"),
     path("volunteers/create", create_volunteer, name="create_volunteers"),
     path("volunteers/<int:pk>", manage_volunteer, name="manage_volunteers"),
+    path("volunteers/<int:pk>/notifications/", get_notifications, name="get_notifications"),
     
     path("events/", get_events, name="get_events"),
     path("events/create", create_event, name="create_events"),
