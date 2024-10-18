@@ -57,7 +57,7 @@ class Volunteer(AbstractUser):
     
     skills = models.TextField(blank=True)
     preferences = models.TextField(blank=True)
-    notififications = models.TextField(blank=True)
+    notifications = models.TextField(blank=True)
     availability = models.JSONField(default=dict)
     
     # allows for multiple skill choices from form

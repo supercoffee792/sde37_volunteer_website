@@ -59,7 +59,7 @@ export default function Findevents() {
         });
 
         const data = await response.json();
-        console.log("Logged-in User Data:", data); // Log the user data
+        console.log("Logged-in User Data:", data);
         setLoginUser(data);
         setLogin(true);
       }
@@ -140,11 +140,14 @@ export default function Findevents() {
 
         if (response.ok) {
           console.log("Successfully signed up for the event");
+          alert("Successfully signed up for the event!");
         } else {
           console.log("Error signing up for the event");
+          alert("Error signing up for the event.");
         }
       } catch (err) {
         console.log(err);
+        alert("An error occurred while signing up.");
       }
     }
   };

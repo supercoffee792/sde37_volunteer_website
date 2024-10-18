@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -105,6 +106,17 @@ def manage_volunteer(request, pk):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(['GET'])
+def get_notifications(request, pk):
+    try:
+        volunteer = Volunteer.objects.get(pk=pk)
+        notifications = volunteer.notifications.split(',') if volunteer.notifications else []
+        return Response({'notifications': notifications})
+    
+    except Volunteer.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    
 # Event view operations
 @api_view(['GET'])
 def get_events(request):
@@ -147,6 +159,17 @@ def manage_event(request, pk):
         serializer = EventSerializer(event, data=event_data)
         if serializer.is_valid():
             serializer.save()
+
+            # Send notification to all volunteers associated w/ the event
+            notification = f"The organizer has made changes to event: {event.name}"
+            for volunteer in event.volunteers.all():
+                current_notifications = volunteer.notifications.split(',') if volunteer.notifications else []
+                current_notifications.append(notification)
+
+                volunteer.notifications = ','.join(filter(None, current_notifications))
+                volunteer.save()
+
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
