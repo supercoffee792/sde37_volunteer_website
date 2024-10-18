@@ -2,7 +2,13 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import Volunteer, Event
 
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = '__all__'
+
 class VolunteerSerializer(serializers.ModelSerializer):
+    events = EventSerializer(many=True, read_only=True)
     class Meta:
         model = Volunteer
         fields = '__all__'
@@ -38,8 +44,3 @@ class VolunteerLoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Wrong username or password")
-        
-class EventSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = '__all__'
