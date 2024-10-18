@@ -52,6 +52,15 @@ const ageRanges = [
     '61+'
 ]
 
+interface EventData {
+    id: number;
+    name: string;
+    date: string;
+    location: string;
+    urgency: string;
+    description: string;
+}
+
 interface VolunteerData { // data types expected when creating event object
     id: number;
     address1: string;
@@ -76,6 +85,7 @@ interface VolunteerData { // data types expected when creating event object
     username: string;
     zipcode: string;
     availability: Record<string, { startTime: string | null; endTime: string | null }>;
+    events: EventData[];
 };
 
 const initialState = {
@@ -761,6 +771,23 @@ export default function Userprofile() {
                         {/* Event History*/}
                         <div className="mb-4 flex-col">
                             <h2 className="text-2xl text-white font-semibold mb-4">Event History</h2>
+                            <div className="bg-white p-6 rounded-lg whitespace-nowrap shadow-md flex overflow-x-auto space-x-4 max-w-full">
+                             {loginUser && loginUser.events.length > 0 ? (
+                            loginUser.events.map((event) => (
+                                <div key={event.id} className="min-w-[250px] bg-gray-100 p-4 rounded-lg overflow-x-hidden">
+                                <h3 className="text-xl font-bold">{event.name}</h3>
+                                <p className="text-sm text-gray-600">Date: {event.date}</p>
+                                <p className="text-sm text-gray-600">Location: {event.location}</p>
+                                <p className="text-sm text-gray-500">Description: {event.description}</p>
+                                </div>
+                            ))
+                            ) : (
+                            <p className="text-gray-500">No events signed up for.</p>
+                            )} 
+                        </div>
+
+
+                            {/* <h2 className="text-2xl text-white font-semibold mb-4">Event History</h2>
                             <div className="bg-white p-6 rounded-lg shadow-md flex overflow-x-auto space-x-4">
                                 <div className="min-w-[250px] bg-gray-100 p-4 rounded-lg">
                                     <h3 className="text-xl font-bold">Event Name</h3>
@@ -798,7 +825,7 @@ export default function Userprofile() {
                                     <p className="text-sm text-gray-600">Location: San Francisco, CA</p>
                                     <p className="text-sm text-gray-500">Description: A discussion on...</p>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                         {/* Availability Section */}
                         <div className="mb-4 flex-col">
