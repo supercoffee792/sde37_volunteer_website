@@ -112,6 +112,15 @@ def get_events(request):
     serialized_data = EventSerializer(events, many=True).data
     return Response(serialized_data)
 
+@api_view(['GET'])
+def get_one_event(request, pk):
+    try:
+        event = Event.objects.get(pk=pk)
+        serialized_data = EventSerializer(event).data
+        return Response(serialized_data, status=status.HTTP_200_OK)
+    except Event.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 @api_view(['POST'])
 def create_event(request):
     event_data = request.data

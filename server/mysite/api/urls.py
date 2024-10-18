@@ -16,5 +16,6 @@ urlpatterns = [
     path("events/", get_events, name="get_events"),
     path("events/create", create_event, name="create_events"),
     path("events/<int:pk>", manage_event, name="manage_event"),
-    path("events/<int:pk>/signup/", event_signup, name="event_signup",)
+    path("events/<int:pk>/signup/", event_signup, name="event_signup"),
+    path("events/one/<int:pk>", get_one_event, name="get_one_event")
 ]

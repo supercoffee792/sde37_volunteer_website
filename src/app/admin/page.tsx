@@ -14,8 +14,37 @@ interface EventData { // data types expected when creating event object
   description: string;
 };
 
+interface VolunteerData {
+  id: number;
+  address1: string;
+  address2: string;
+  age: string;
+  city: string;
+  date_joined: string;
+  email: string;
+  first_name: string;
+  gender: string;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  last_login: string | null;
+  last_name: string;
+  notififications: string;
+  pfp: string;
+  preferences: string;
+  profilename: string;
+  skills: string;
+  state: string;
+  username: string;
+  zipcode: string;
+  availability: Record<string, { startTime: string | null; endTime: string | null }>;
+};
+
 export default function Adminpage() {
     const [events, setEvent] = useState<EventData[]>([]);
+    const [volunteerList, setVolunteerList] = useState<VolunteerData[]>([]);
+    const [currVolunteers, setCurrVolunteers] = useState<VolunteerData[]>([]);
+    const [filterEvent, setFilterEvent] = useState<EventData>();
 
     // Event attribute states
     const [name, setName] = useState<string>("");
@@ -104,6 +133,7 @@ export default function Adminpage() {
 
     useEffect(() => {
         fetchEvents();
+        fetchVolunteers();
     }, []);
 
     const fetchEvents = async() => {
@@ -228,6 +258,51 @@ export default function Adminpage() {
 
     const adminLogout = async() => {
 
+    };
+
+    const fetchVolunteers = async() => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/volunteers/");
+        const data = await response.json();
+        setVolunteerList(data);
+        setCurrVolunteers(data);
+        } 
+        catch (err) {
+            console.log(err);
+        }
+    }
+
+    const filterVolunteers = async(event_item: EventData) => {
+        try {
+          const temp_id = event_item.id;
+          const response = await fetch(`http://127.0.0.1:8000/api/events/one/${temp_id}`);
+          const data = await response.json();
+          setFilterEvent(data);
+          const temp_skills = data.skills.split(',');
+
+          let new_volunteers: VolunteerData[] = [];
+
+          volunteerList.forEach((volunteer) => {
+            const volunteer_skills = volunteer.skills.split(',');
+            if (volunteer_skills.some(skill => temp_skills?.includes(skill))) {
+              new_volunteers.push(volunteer);
+            }
+          });
+
+          if (new_volunteers) {
+            setCurrVolunteers(new_volunteers);
+          }
+          else {
+            alert("No matching volunteers with needed skills");
+          }
+        }
+        catch (err) {
+          console.log(err);
+        }
+    };
+
+    const resetVolunteers = () => {
+      setCurrVolunteers(volunteerList);
     };
 
     return (
@@ -421,7 +496,14 @@ export default function Adminpage() {
 
                 {events.map((item) => (
                   <li key={item.id} className="bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                    <h3 className="text-lg font-medium text-white">{item.name}</h3>
+                    <div className="flex justify-between">
+                        <h3 className="text-lg font-medium text-white">{item.name}</h3>
+                        <div className="space-x-2">
+                          <button onClick={() => filterVolunteers(item)} className="w-auto ml-auto bg-gray-800 text-white text-sm p-2 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                               Filter/match volunteers
+                          </button>
+                        </div>
+                    </div>
                     <p className="text-slate-300">Date: {item.date}</p>
                     <p className="text-slate-300">Location: {item.location}</p>
                     <p className="text-slate-300">Description: {item.description}</p>
@@ -440,41 +522,24 @@ export default function Adminpage() {
 
             {/* Volunteers List */}
             <div className="bg-slate-700 p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-white mb-6">Volunteers</h2>
+              <div className="flex justify-between">
+                <h2 className="text-2xl font-semibold text-white mb-6">Volunteers</h2>
+                <button onClick={() => resetVolunteers()} className="w-auto ml-auto bg-gray-800 text-white text-sm p-2 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    Reset volunteer list
+                </button>
+              </div>
               <button className="w-auto mb-4 bg-gray-600 text-white text-sm p-3 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none">Send Alert to Volunteers</button>
               <ul className="space-y-6">
-                <li className="flex items-center bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <img src="https://picsum.photos/200" alt="placeholder" className="w-14 h-14 rounded-full mr-4"/>
-                  <div>
-                    <h3 className="text-lg font-medium text-white">Aaron Medina</h3>
-                    <p className="text-slate-300">Age: 34</p>
-                    <p className="text-slate-300">Skills: CPR certified</p>
-                  </div>
-                </li>
-                <li className="flex items-center bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <img src="https://picsum.photos/200" alt="placeholder" className="w-14 h-14 rounded-full mr-4"/>
-                  <div>
-                    <h3 className="text-lg font-medium text-white">Alek Mazey</h3>
-                    <p className="text-slate-300">Age: 67</p>
-                    <p className="text-slate-300">Skills: Strong lifter</p>
-                  </div>
-                </li>
-                <li className="flex items-center bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <img src="https://picsum.photos/200" alt="placeholder" className="w-14 h-14 rounded-full mr-4"/>
-                  <div>
-                    <h3 className="text-lg font-medium text-white">Precious Ndubueze</h3>
-                    <p className="text-slate-300">Age: 43</p>
-                    <p className="text-slate-300">Skills: Good with kids</p>
-                  </div>
-                </li>
-                <li className="flex items-center bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
-                  <img src="https://picsum.photos/200" alt="placeholder" className="w-14 h-14 rounded-full mr-4"/>
-                  <div>
-                    <h3 className="text-lg font-medium text-white">Vicky Bayang</h3>
-                    <p className="text-slate-300">Age: 40</p>
-                    <p className="text-slate-300">Skills: Good with pets</p>
-                  </div>
-                </li>
+                {currVolunteers.map((item) => (
+                  <li key={item.id} className="flex items-center bg-slate-600 p-4 rounded-lg shadow hover:bg-slate-500 transition-colors">
+                    <img src="https://picsum.photos/200" alt="placeholder" className="w-14 h-14 rounded-full mr-4"/>
+                    <div>
+                      <h3 className="text-lg font-medium text-white">{item.profilename}</h3>
+                      <p className="text-slate-300">Age: {item.age}</p>
+                      <p className="text-slate-300">Skills: {item.skills}</p>
+                    </div>
+                  </li>
+                ))}
               </ul>
             </div>
         
