@@ -254,3 +254,42 @@ class EventAPITest(APITestCase):
         url = reverse('manage_event', args=[event.id])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+
+##EVENT SIGNUP TEST CASES########
+class EventSignupTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.volunteer = Volunteer.objects.create_user(
+            username="testuser",
+            password="testpassword123"
+        )
+        
+        cls.event = Event.objects.create(
+            name="Test Event",
+            date="2024-09-30",
+            location="Test Location",
+            urgency="Not urgent",
+            skills="Test Skills",
+            description="Test Description"
+        )
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.volunteer)
+
+    def test_event_signup_url_exists(self):
+        url = reverse('event_signup', args=[self.event.id])
+        response = self.client.post(url)
+        self.assertNotEqual(response.status_code, 404)
+
+    def test_event_signup_successful(self):
+        url = reverse('event_signup', args=[self.event.id])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.volunteer in self.event.volunteers.all())
+
+    def test_event_signup_get_method(self):
+        url = reverse('event_signup', args=[self.event.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
