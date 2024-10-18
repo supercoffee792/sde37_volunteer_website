@@ -19,27 +19,6 @@ const daysOfWeek = [
 ];
 
 const images = [ 'bear.png', 'bird.png', 'chameleon.png', 'frog.png', 'raccoon.png', 'turtle.png']
-// { label: 'bear', value: 'bear.png', src: bearImage.src },
-// { label: 'bird', value: 'bird.png', src: birdImage.src },
-// { label: 'chameleon', value: 'chameleon.png', src: chameleonImage.src },
-// { label: 'frog', value: 'frog.png', src: frogImage.src },
-// { label: 'raccoon', value: 'raccoon.png', src: raccoonImage.src },
-// { label: 'turtle', value: 'turtle.png', src: turtleImage.src }
-// ];
-
-// const availableSkills = [
-//     'Problem solving',
-//     'Good with pets',
-//     'Good with kids',
-//     'Programming',
-//     'Leadership',
-//     'Writing',
-//     'CPR certified',
-//     'Carpentry',
-//     'Cooking',
-//     'Multilingual',
-//     'Creative arts',
-// ];
 
 const ageRanges = [
     'Under 15',
